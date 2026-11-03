@@ -1,85 +1,90 @@
-# ⚡ HyperXLauncher
+<p align="center">
+  <img alt="HyperXLauncher Logo" width="128" height="128" src="https://raw.githubusercontent.com/duongsecretvn/HyperXLauncher/main/xmcl-electron-app/icons/dark%40256x256.png">
+</p>
+
+<h1 align="center">HyperXLauncher</h1>
 
 <p align="center">
-  <img src="assets/logo.webp" alt="HyperXLauncher Logo" width="128" height="128">
+  <strong>Trình khởi chạy Minecraft hiện đại, tối ưu hóa tốc độ và giao diện tùy biến cao.</strong>
 </p>
 
 <p align="center">
-  <strong>Trình khởi chạy Minecraft hiệu năng cao, tối giản và không bloatware.</strong>
+  <a href="https://github.com/duongsecretvn/HyperXLauncher/releases">
+    <img src="https://img.shields.io/github/v/release/duongsecretvn/HyperXLauncher?color=blue&label=Phi%C3%AAn%20b%E1%BA%A3n" alt="Release">
+  </a>
+  <a href="https://github.com/duongsecretvn/HyperXLauncher/blob/main/LICENSE">
+    <img src="https://img.shields.io/badge/Gi%E1%BA%A5y%20ph%C3%A9p-MIT-green.svg" alt="License">
+  </a>
+  <a href="https://nodejs.org">
+    <img src="https://img.shields.io/badge/Node.js-%3E%3D22.16.0-brightgreen" alt="Node.js">
+  </a>
+  <a href="https://pnpm.io">
+    <img src="https://img.shields.io/badge/Package%20Manager-pnpm-orange" alt="pnpm">
+  </a>
 </p>
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20Linux%20%7C%20macOS-blue?style=flat-square" alt="Platform">
-  <img src="https://img.shields.io/badge/Minecraft-1.7.10%20--%20Latest-brightgreen?style=flat-square" alt="Minecraft Versions">
-  <img src="https://img.shields.io/badge/UI-Dark%20Mode-111112?style=flat-square" alt="Dark Mode">
-  <img src="https://img.shields.io/badge/Release-Stable%20%2F%20Nightly-orange?style=flat-square" alt="Release Channels">
-</p>
+---
+
+## 🌟 Tính năng nổi bật (Features)
+
+- ⚡ **Khởi động siêu tốc & Tối ưu hóa JVM**: Tích hợp bộ cờ G1GC tối tân, kích hoạt ép buộc GPU rời hiệu năng cao (NVIDIA / AMD High-Performance Dedicated GPU), nâng mức ưu tiên CPU và cơ chế chống sập (anti-crash heap protection).
+- 🎨 **Giao diện hiện đại & Độc quyền**: Thiết kế tối giản, hỗ trợ bộ chọn font chữ linh hoạt (kèm font pixel Minecraft đặc trưng), hiệu ứng chuyển cảnh mượt mà và giao diện tối (Dark theme).
+- 🔄 **Cập nhật tự động (In-App Updates)**: Dễ dàng kiểm tra bản cập nhật mới nhất và tự động tải phiên bản mới trực tiếp bên trong launcher.
+- 🧩 **Hỗ trợ Mod đa dạng**: Tương thích hoàn toàn với Modrinth, CurseForge, Fabric, Forge, NeoForge, Quilt và OptiFine.
+- 🔐 **Quản lý tài khoản thông minh**: Đăng nhập nhanh tài khoản Microsoft và tài khoản Ngoại tuyến (Offline), chuyển đổi tài khoản chỉ với 1 cú click.
+- 💻 **Đa nền tảng (Cross-Platform)**: Hoạt động mượt mà trên hệ điều hành Windows, Linux và macOS.
 
 ---
 
-## 📖 Giới thiệu
+## 🚀 Cài đặt & Tải về (Download)
 
-**HyperXLauncher** được thiết kế nhằm mục đích mang lại trải nghiệm chiến game mượt mà và trực quan nhất. Thay vì tích hợp các tiện ích rườm rà làm nặng máy, launcher tập trung tối đa vào tốc độ xử lý, giải phóng tài nguyên CPU/RAM để dàn máy của bạn luôn đạt mức FPS ổn định nhất trong game.
+Tải phiên bản mới nhất tại mục [Releases](https://github.com/duongsecretvn/HyperXLauncher/releases):
 
-Giao diện Dark Mode hiện đại, các thao tác được rút gọn tối đa: từ tải modpack, cài đặt thư viện đến khởi chạy instance chỉ với một cú nhấp chuột.
-
----
-
-## ✨ Tính năng nổi bật
-
-* 🚀 **Hiệu năng vượt trội:** Không tiêu tốn RAM nền, tối ưu hóa toàn bộ luồng khởi chạy Java và Minecraft.
-* 🛠️ **Hỗ trợ Modloader toàn diện:** Tương thích tự động và cài đặt nhanh các nền tảng mod phổ biến:
-  * **Fabric** & **Forge**
-  * **NeoForge**
-  * **OptiFine** & **LabyMod**
-* 📦 **Tích hợp CurseForge:** Tìm kiếm, duyệt và cài đặt mod, modpack trực tiếp ngay trên launcher mà không cần mở trình duyệt.
-* ⚡ **Tải xuống đa luồng (Multi-threaded Engine):** Cơ chế tải tệp tin thông minh, phân chia phân đoạn giúp tăng tốc độ nạp thư viện game và tránh lỗi file rỗng.
-* 📂 **Quản lý Instance độc lập:** Tách biệt hoàn toàn các phiên bản, mod, thế giới (saves), resource packs và file cấu hình `options.txt` giữa các hồ sơ chơi game.
-* ☕ **Tự động quản lý Java Runtime:** Tự động phát hiện hoặc tải đúng phiên bản Java phù hợp cho từng bản Minecraft (từ 1.7.10 đến các bản mới nhất).
-* 🎮 **Discord Rich Presence (RPC):** Hiển thị chi tiết phiên bản và trạng thái chơi game trực tiếp lên trang cá nhân Discord.
-* 🔄 **Hệ thống cập nhật thông minh:** Cung cấp 2 kênh phát hành riêng biệt: **Stable** (ổn định tuyệt đối) và **Nightly** (trải nghiệm sớm tính năng mới).
+- **Windows**: `HyperXLauncher-Setup-x64.exe` (hoặc bản Portable `.zip`)
+- **Linux**: `HyperXLauncher-x86_64.AppImage` / `.deb`
+- **macOS**: `HyperXLauncher-universal.dmg`
 
 ---
 
-## 📥 Tải về & Cài đặt
+## 🛠️ Hướng dẫn Build từ Source (Build from Source)
 
-Truy cập mục [Releases](../../releases) để tải bộ cài đặt mới nhất:
+### 1. Yêu cầu hệ thống
+- **Node.js**: Phiên bản `>= 22.16.0`
+- **pnpm**: Khuyên dùng `pnpm@11` (`corepack enable && corepack use pnpm@latest`)
+- **Git**
 
-1. Tải tệp cài đặt phù hợp với hệ điều hành của bạn (`.exe` cho Windows).
-2. Chạy tệp cài đặt và mở ứng dụng.
-3. Tạo instance mới, chọn phiên bản Minecraft cùng Modloader mong muốn và bấm **Play**.
+### 2. Cài đặt môi trường
+```bash
+# Clone source code
+git clone https://github.com/duongsecretvn/HyperXLauncher.git
+cd HyperXLauncher
+
+# Cài đặt toàn bộ dependencies
+pnpm install
+
+# Biên dịch các package lõi
+pnpm compile
+```
+
+### 3. Chạy ở chế độ phát triển (Development)
+```bash
+# Terminal 1: Chạy Vite Renderer UI
+pnpm dev:renderer
+
+# Terminal 2: Chạy Electron Main Process
+pnpm dev:main
+```
+
+### 4. Đóng gói ứng dụng (Build App)
+```bash
+# Đóng gói bộ cài đặt đầy đủ cho nền tảng hiện tại
+pnpm build:all
+```
+File cài đặt hoàn thiện sẽ được xuất tại thư mục: `xmcl-electron-app/dist/`.
 
 ---
 
-## 🛠️ Yêu cầu hệ thống
+## 📄 Bản quyền (License)
 
-| Phần cứng | Yêu cầu tối thiểu | Khuyến nghị |
-| :--- | :--- | :--- |
-| **Hệ điều hành** | Windows 10/11 64-bit | Windows 10/11 64-bit |
-| **RAM** | 4 GB | 8 GB trở lên |
-| **Ổ cứng** | Trống tối thiểu 1 GB | Ổ cứng SSD |
-| **Java** | Tự động tải qua launcher | Tự động tải qua launcher |
-
----
-
-## 🐛 Báo lỗi & Góp ý (Bug Reports & Feedback)
-
-Nếu bạn gặp sự cố crash game, lỗi nạp mod hoặc có đề xuất cải tiến giao diện:
-1. Mở mục [Issues](../../issues) trên GitHub.
-2. Cung cấp file log (`crash-report` hoặc `latest.log`) kèm thông số phiên bản bạn đang chơi.
-3. Hoặc liên hệ trực tiếp tại máy chủ cộng đồng Discord của chúng tôi.
-
----
-
-## 💬 Cộng đồng
-
-Tham gia cộng đồng để nhận thông báo cập nhật, chia sẻ cấu hình tối ưu FPS và hỗ trợ kỹ thuật:
-
-* **Discord Server:** [Tham gia Discord](https://discord.gg/your-link)
-* **Reddit Subreddit:** [r/HyperXLauncher](https://reddit.com/r/HyperXLauncher)
-
----
-
-<p align="center">
-  <i>Được xây dựng với trọng tâm hiệu năng và sự tối giản cho cộng đồng Minecraft.</i>
-</p>
+Dự án được phân phối dưới giấy phép [MIT License](LICENSE).
+Minecraft là thương hiệu đã đăng ký của Mojang Synergies AB / Microsoft. Dự án này không phải là sản phẩm chính thức và không được liên kết với Mojang hoặc Microsoft.
