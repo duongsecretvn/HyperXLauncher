@@ -101,6 +101,7 @@ export const config = {
     differentialPackage: false,
   },
   linux: {
+    maintainer: 'duongsecretvn <duongsecretvn@gmail.com>',
     executableName: 'HyperXLauncher',
     electronLanguages: ['en-US'],
     desktop: {

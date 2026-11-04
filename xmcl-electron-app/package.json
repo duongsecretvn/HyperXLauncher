@@ -3,7 +3,7 @@
     "private": true,
     "main": "./index.js",
     "version": "1.0.0",
-    "author": "duongsecretvn",
+    "author": "duongsecretvn <duongsecretvn@gmail.com>",
     "description": "HyperXLauncher - Modern & Optimized Minecraft Launcher",
     "license": "MIT",
     "engines": {
