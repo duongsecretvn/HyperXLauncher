@@ -80,6 +80,8 @@ import { useTogetherMultiplayer } from './multiplayerTogether'
 
 export default defineComponent({
   setup(props, ctx) {
+    provide(kEnvironment, useEnvironment())
+
     provide(kServerStatusCache, useServerStatusCache())
 
     provide(kDropHandler, useDropHandler())
@@ -217,7 +219,6 @@ export default defineComponent({
     )
     provide(kModLibCleaner, useModLibCleaner(instanceMods.mods, instanceMods.allowLoaders))
     provide(kModUpgrade, modUpgrade)
-    provide(kEnvironment, useEnvironment())
 
     const instanceTheme = useInstanceTheme(instance.path)
     provide(kInstanceTheme, instanceTheme)

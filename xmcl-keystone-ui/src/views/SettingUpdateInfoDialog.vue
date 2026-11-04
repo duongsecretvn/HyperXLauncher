@@ -174,11 +174,11 @@
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue'
+import { computed, inject, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { kEnvironment } from '@/composables/environment'
+import { kEnvironment, useEnvironment } from '@/composables/environment'
 import { useMarkdown } from '@/composables/markdown'
-import { kUpdateSettings } from '@/composables/setting'
+import { kUpdateSettings, useUpdateSettings } from '@/composables/setting'
 import { getLocalDateString } from '@/util/date'
 import { injection } from '@/util/inject'
 import { useDialog } from '../composables/dialog'
@@ -200,7 +200,7 @@ const {
   testDownloadedSize,
   testTotalSize,
   resetTestUpdate,
-} = injection(kUpdateSettings)
+} = inject(kUpdateSettings, undefined) ?? useUpdateSettings()
 
 function renderUpdate() {
   const body = updateInfo.value?.body ?? ''
@@ -208,7 +208,7 @@ function renderUpdate() {
   return render(transformed)
 }
 const body = computed(() => renderUpdate())
-const env = injection(kEnvironment)
+const env = inject(kEnvironment, undefined) ?? useEnvironment()
 const isAppX = computed(() => env.value?.env === 'appx')
 const hintRedownload = computed(() =>
   updateInfo.value?.operation === 'manual',

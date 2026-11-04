@@ -2,20 +2,21 @@ import { useService } from '@/composables'
 import { injection } from '@/util/inject'
 import { clientCurseforgeV1 } from '@/util/clients'
 import { BaseServiceKey, Environment, Settings, ReleaseInfo } from '@xmcl/runtime-api'
-import { InjectionKey, Ref } from 'vue'
+import { InjectionKey, Ref, inject, ref } from 'vue'
 import { useLocalStorage } from '@vueuse/core'
-import { kEnvironment } from './environment'
+import { kEnvironment, useEnvironment } from './environment'
 import { useState } from './syncableState'
 
 export const kUpdateSettings: InjectionKey<ReturnType<typeof useUpdateSettings>> = Symbol('UpdateSettings')
 
 export function useUpdateSettings() {
   const { checkUpdate, downloadUpdate, quitAndInstall } = useService(BaseServiceKey)
-  const env: Ref<Environment | undefined> = injection(kEnvironment)
-  const { state } = injection(kSettingsState)
+  const env: Ref<Environment | undefined> = inject(kEnvironment, undefined) ?? useEnvironment()
+  const settingsState = inject(kSettingsState, undefined)
+  const state = settingsState ? settingsState.state : ref<Settings | undefined>(undefined)
   const updateStatus = computed(() => state.value?.updateStatus)
   const updateInfo = computed(() => state.value?.updateInfo)
-  const version = computed(() => env.value?.version ?? '0.0.0')
+  const version = computed(() => env.value?.version ?? '1.0.0')
   const installing = ref(false)
 
   // Test mode states

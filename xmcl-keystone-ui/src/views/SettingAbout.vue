@@ -194,11 +194,11 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, ref } from 'vue'
+import { computed, inject, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { injection } from '@/util/inject'
 import { useDialog } from '../composables/dialog'
-import { kUpdateSettings } from '../composables/setting'
+import { kUpdateSettings, useUpdateSettings } from '../composables/setting'
 import SettingCard from '@/components/SettingCard.vue'
 import logo from '../assets/logo.webp'
 
@@ -211,7 +211,7 @@ const {
   checkUpdate,
   checkingUpdate,
   version,
-} = injection(kUpdateSettings)
+} = inject(kUpdateSettings, undefined) ?? useUpdateSettings()
 
 const { t } = useI18n()
 
