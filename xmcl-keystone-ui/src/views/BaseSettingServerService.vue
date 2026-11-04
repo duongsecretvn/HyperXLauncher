@@ -111,7 +111,7 @@ const targetConfigured = computed(() => target === 'local' || !!instance.value.r
 
 function defaultServiceName() {
   const slug = instance.value.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-  return `xmcl-${slug || 'server'}`
+  return `hyperx-${slug || 'server'}`
 }
 
 function syncDesiredService() {

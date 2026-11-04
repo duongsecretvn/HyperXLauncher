@@ -14,7 +14,7 @@ export class ElectronSession {
 
   #resolve(url: string): Session {
     const parsed = new URL(url)
-    if (parsed.hostname === HOST) {
+    if (parsed.hostname === HOST || parsed.hostname === 'hyperx.runtime' || parsed.hostname === 'xmcl.runtime') {
       if (existsSync(join(this.app.appDataPath, 'Partitions', 'main'))) {
         return session.fromPartition('persist:main')
       } else {
@@ -51,7 +51,7 @@ export class ElectronSession {
 
     const handler = async (request: Request): Promise<Response> => {
       const url = new URL(request.url)
-      if (url.host === HOST && !HAS_DEV_SERVER) {
+      if ((url.host === HOST || url.host === 'hyperx.runtime' || url.host === 'xmcl.runtime') && !HAS_DEV_SERVER) {
         const realPath = join(__dirname, 'renderer', url.pathname)
         const mimeType =
           url.pathname.endsWith('.js')

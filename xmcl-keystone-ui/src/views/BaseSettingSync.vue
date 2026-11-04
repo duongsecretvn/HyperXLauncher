@@ -48,7 +48,7 @@ import { InstanceEditInjectionKey } from '../composables/instanceEdit'
 const { data } = injection(InstanceEditInjectionKey)
 const { t } = useI18n()
 const gotoHelp = () => {
-  window.open('https://xmcl.app/faq/', 'browser')
+  window.open('https://github.com/duongsecretvn/HyperXLauncher#faq', 'browser')
 }
 
 </script>

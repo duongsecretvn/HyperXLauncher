@@ -770,7 +770,7 @@ const { refresh: onPlay, refreshing: loading, error } = useRefreshable(async () 
 })
 
 function getDesiredConfiguration(): InstanceServerConfig {
-  const serviceName = instance.value.serverConfig?.service.name || `xmcl-${instance.value.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'server'}`
+  const serviceName = instance.value.serverConfig?.service.name || `hyperx-${instance.value.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'server'}`
   return {
     eula: isAcceptEula.value,
     motd: motd.value || 'A Minecraft Server',

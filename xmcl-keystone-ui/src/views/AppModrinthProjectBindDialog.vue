@@ -65,7 +65,7 @@ const error = ref('')
 // Modrinth only finalizes a project's `project_type` once its first version is
 // uploaded (the type is inferred from that version's loaders). Until then, a
 // fresh draft reports the generic type `project`, which is still bindable —
-// publishing the first version through XMCL will establish it as a modpack.
+// publishing the first version through HyperXLauncher will establish it as a modpack.
 // A project that already has an established, different type (mod,
 // resourcepack, shader, plugin, datapack) can never become a modpack because
 // Modrinth does not allow changing `project_type` after creation.

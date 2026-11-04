@@ -65,7 +65,7 @@ export function useCustomCss(deps: CustomCssDeps) {
 
   useStyleTag(effectiveCss, {
     immediate: true,
-    id: 'xmcl-custom-css',
+    id: 'hyperx-custom-css',
   })
 
   // Custom background video URL declared via the --custom-background-video variable.
