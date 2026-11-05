@@ -32,6 +32,7 @@ import { kSettings } from '~/settings'
 import { checksum } from '~/util/fs'
 import ElectronLauncherApp from '../ElectronLauncherApp'
 import { ensureElevateExe } from './elevate'
+import semver from 'semver'
 
 const kPatched = Symbol('Patched')
 
@@ -310,6 +311,22 @@ function isSameVersion(a: string, b: string) {
   return a === b
 }
 
+function isNewerVersion(currentVersion: string, remoteVersion: string): boolean {
+  if (!remoteVersion) return false
+  const cur = currentVersion.startsWith('v') ? currentVersion.substring(1) : currentVersion
+  const rem = remoteVersion.startsWith('v') ? remoteVersion.substring(1) : remoteVersion
+  try {
+    const semCur = semver.coerce(cur)
+    const semRem = semver.coerce(rem)
+    if (semCur && semRem) {
+      return semver.gt(semRem, semCur)
+    }
+  } catch {
+    // fallback
+  }
+  return cur !== rem
+}
+
 export class ElectronUpdater implements LauncherAppUpdater {
   private logger: Logger
 
@@ -348,7 +365,7 @@ export class ElectronUpdater implements LauncherAppUpdater {
           body: result.body || '',
           date: result.published_at || new Date().toISOString(),
           files,
-          newUpdate: !isSameVersion(app.version, version),
+          newUpdate: isNewerVersion(app.version, version),
           operation: ElectronUpdateOperation.Manual,
         }
 
@@ -401,7 +418,7 @@ export class ElectronUpdater implements LauncherAppUpdater {
       body: info.updateInfo.releaseNotes as string,
       date: info.updateInfo.releaseDate,
       files,
-      newUpdate: !isSameVersion(info.updateInfo.version, this.app.version),
+      newUpdate: isNewerVersion(this.app.version, info.updateInfo.version),
       operation: ElectronUpdateOperation.AutoUpdater,
     }
 

@@ -92,6 +92,8 @@ import { UserSkinRenderPaused } from '@/composables/userSkin'
 import AppSideBarGroupSettingDialog from '@/views/AppSideBarGroupSettingDialog.vue'
 import AppGamepadPrompt from '@/views/AppGamepadPrompt.vue'
 import { useInstanceGroupDefaultColor } from '@/composables/instanceGroup'
+import { useService } from '@/composables/service'
+import { BaseServiceKey } from '@xmcl/runtime-api'
 
 const lazyDialogComponents = {
   'task': defineAsyncComponent(() => import('@/views/AppTaskDialog.vue')),
@@ -257,6 +259,16 @@ watch(() => state.value?.updateStatus, (status) => {
     })
   }
 }, { immediate: true })
+
+// Auto check for updates on startup
+onMounted(() => {
+  setTimeout(() => {
+    try {
+      const { checkUpdate } = useService(BaseServiceKey)
+      checkUpdate().catch(() => {})
+    } catch {}
+  }, 2500)
+})
 </script>
 
 <style scoped>

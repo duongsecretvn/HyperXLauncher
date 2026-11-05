@@ -19,7 +19,7 @@ new Function('require', 'module', 'exports', compiled)((id: string) => {
 
 describe('XMCL icon registration', () => {
   it.each([
-    ['reddit', 'RedditIcon.vue'], ['github', 'GithubIcon.vue'], ['technic', 'TechnicIcon.vue'],
+    ['reddit', 'RedditIcon.vue'], ['telegram', 'TelegramIcon.vue'], ['github', 'GithubIcon.vue'], ['technic', 'TechnicIcon.vue'],
     ['modrinth', 'ModrinthIcon.vue'], ['curseforge', 'CurseforgeIcon.vue'],
   ])('preserves the %s icon when adding import providers', (icon, name) => {
     expect(module.exports.vuetify.icons.sets.xmcl.component({ icon }).type).toMatchObject({ name })

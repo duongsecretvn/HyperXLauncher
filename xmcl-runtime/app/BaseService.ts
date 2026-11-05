@@ -237,7 +237,6 @@ export class BaseService extends AbstractService implements IBaseService {
    */
   @Singleton()
   async checkUpdate() {
-    if (HAS_DEV_SERVER) return
     try {
       const settings = await this.getSettings()
       this.log('Check update')

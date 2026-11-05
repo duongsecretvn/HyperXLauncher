@@ -123,7 +123,18 @@
           Để sau
         </v-btn>
 
-        <template v-if="!hintRedownload">
+        <template v-if="hintRedownload">
+          <v-btn
+            color="primary"
+            variant="elevated"
+            class="font-weight-bold"
+            @click="openGithub()"
+          >
+            <v-icon start>cloud_download</v-icon>
+            Tải bản cập nhật mới
+          </v-btn>
+        </template>
+        <template v-else>
           <v-btn
             v-if="updateStatus === 'pending'"
             color="primary"

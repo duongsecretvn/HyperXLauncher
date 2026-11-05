@@ -7,6 +7,7 @@ import MicrosoftIcon from '@/components/MicrosoftIcon.vue'
 import GoogleIcon from '@/components/GoogleIcon.vue'
 import DiscordIcon from '@/components/DiscordIcon.vue'
 import RedditIcon from '@/components/RedditIcon.vue'
+import TelegramIcon from '@/components/TelegramIcon.vue'
 import PackageFileIcon from '@/components/PackageFileIcon.vue'
 import ZipFileIcon from '@/components/ZipFileIcon.vue'
 import GithubIcon from '@/components/GithubIcon.vue'
@@ -33,6 +34,7 @@ const xmcl: IconSet = {
       case 'discord': return h(DiscordIcon)
       case 'github': return h(GithubIcon)
       case 'reddit': return h(RedditIcon)
+      case 'telegram': return h(TelegramIcon)
       case 'technic': return h(TechnicIcon)
       case 'forge': return h(ImageIcon, { src: BuiltinImages.forge })
       case 'fabric': return h(ImageIcon, { src: BuiltinImages.fabric })
@@ -60,7 +62,12 @@ export const vuetify = createVuetify({
   },
   icons: {
     defaultSet: 'md',
-    aliases,
+    aliases: {
+      ...aliases,
+      telegram: 'xmcl:telegram',
+      reddit: 'xmcl:reddit',
+      github: 'xmcl:github',
+    },
     sets: { md, xmcl },
   },
   defaults: {

@@ -75,7 +75,8 @@
                   :target="channel.target"
                   variant="flat"
                   size="small"
-                  class="flex-shrink-0"
+                  class="flex-shrink-0 text-white font-weight-medium"
+                  @click.prevent="openUrl(channel.link)"
                 >
                   {{ channel.buttonText }}
                   <v-icon end size="14">open_in_new</v-icon>
@@ -96,15 +97,37 @@ import { useDialog } from '../composables/dialog'
 const { hide, isShown } = useDialog('feedback')
 const { t } = useI18n()
 
+function openUrl(url: string) {
+  window.open(url, 'browser')
+}
+
 const feedbackChannels = computed(() => [
   {
-    title: t('feedback.github'),
-    description: t('feedback.githubDescription'),
-    icon: 'code',
-    color: 'black',
+    title: t('feedback.github', 'GitHub Issues'),
+    description: t('feedback.githubDescription', 'Báo cáo sự cố hoặc đóng góp mã nguồn trên GitHub'),
+    icon: '$github',
+    color: '#24292e',
     link: 'https://github.com/duongsecretvn/HyperXLauncher/issues',
     target: 'browser',
-    buttonText: t('feedback.githubOpenIssue')
+    buttonText: t('feedback.githubOpenIssue', 'GitHub')
+  },
+  {
+    title: 'Telegram Channel',
+    description: 'Tham gia kênh Telegram chính thức của HyperXLauncher để nhận thông báo và hỗ trợ',
+    icon: '$telegram',
+    color: '#229ED9',
+    link: 'https://t.me/hyperxlauncher',
+    target: 'browser',
+    buttonText: 'Tham gia'
+  },
+  {
+    title: 'Reddit Community',
+    description: 'Tham gia cộng đồng HyperXLauncher trên Reddit để thảo luận và chia sẻ kinh nghiệm',
+    icon: '$reddit',
+    color: '#FF4500',
+    link: 'https://reddit.com/r/HyperXLauncher/s/y8C4dXc27k',
+    target: 'browser',
+    buttonText: 'Truy cập'
   }
 ])
 
