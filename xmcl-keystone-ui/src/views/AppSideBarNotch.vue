@@ -4,22 +4,15 @@
     data-testid="app-sidebar"
     class="sidebar-notch-wrapper"
     :class="wrapperClasses"
+    @mouseenter="onMouseEnter"
+    @mouseleave="onMouseLeave"
   >
-    <!-- Localized trigger track aligning the trigger handle strictly with the notch -->
+    <!-- Trigger zone for detecting hover when sidebar is hidden -->
     <div
       v-if="autoHide"
-      class="sidebar-trigger-track"
-      :class="triggerTrackClasses"
-      :style="triggerTrackStyles"
-    >
-      <div
-        class="sidebar-trigger"
-        :class="triggerClasses"
-        :style="triggerHandleStyles"
-        @mouseenter="onMouseEnter"
-        @mouseleave="onMouseLeave"
-      />
-    </div>
+      class="sidebar-trigger"
+      :class="triggerClasses"
+    />
     
     <div
       class="sidebar-notch"
@@ -30,8 +23,6 @@
         ref="container"
         class="sidebar-notch__container"
         :style="containerStyles"
-        @mouseenter="onMouseEnter"
-        @mouseleave="onMouseLeave"
       >
         <!-- My Stuff -->
         <AppSideBarNotchItem
@@ -125,8 +116,7 @@ import { useInjectSidebarSettings } from '@/composables/sidebarSettings'
 import { kTheme } from '@/composables/theme'
 import { kUserContext } from '@/composables/user'
 import { injection } from '@/util/inject'
-import { computed, ref, onMounted, watch } from 'vue'
-import { useResizeObserver } from '@vueuse/core'
+import { computed, ref } from 'vue'
 import AppSideBarNotchItem from './AppSideBarNotchItem.vue'
 import AppSideBarNotchItemGroup from './AppSideBarNotchItemGroup.vue'
 import AppSideBarNotchItemInstance from './AppSideBarNotchItemInstance.vue'
@@ -140,28 +130,6 @@ const { show: showAddInstance } = useDialog(AddInstanceDialogKey)
 
 const { t } = useI18n()
 const route = useRoute()
-
-const container = ref<HTMLElement | null>(null)
-const wrapper = ref<HTMLElement | null>(null)
-const containerWidth = ref(380)
-const containerHeight = ref(56)
-
-useResizeObserver(container, (entries) => {
-  const entry = entries[0]
-  if (entry) {
-    const { width, height } = entry.contentRect
-    if (width > 0) containerWidth.value = Math.round(width)
-    if (height > 0) containerHeight.value = Math.round(height)
-  }
-})
-
-onMounted(() => {
-  if (container.value) {
-    const rect = container.value.getBoundingClientRect()
-    if (rect.width > 0) containerWidth.value = Math.round(rect.width)
-    if (rect.height > 0) containerHeight.value = Math.round(rect.height)
-  }
-})
 
 // Hover state for auto-hide
 const isHovered = ref(false)
@@ -182,47 +150,6 @@ const wrapperClasses = computed(() => ({
   'wrapper--auto-hide': autoHide.value,
   'wrapper--hovered': isHovered.value,
 }))
-
-// Trigger track classes (aligns with notch)
-const triggerTrackClasses = computed(() => ({
-  'trigger-track--left': position.value === 'left',
-  'trigger-track--right': position.value === 'right',
-  'trigger-track--top': position.value === 'top',
-  'trigger-track--bottom': position.value === 'bottom',
-}))
-
-const triggerTrackStyles = computed(() => {
-  const styles: any = {}
-  if (isVertical.value) {
-    if (align.value === 'start') styles.justifyContent = 'flex-start'
-    if (align.value === 'center') styles.justifyContent = 'center'
-    if (align.value === 'end') styles.justifyContent = 'flex-end'
-  } else {
-    if (align.value === 'start') styles.justifyContent = 'flex-start'
-    if (align.value === 'center') styles.justifyContent = 'center'
-    if (align.value === 'end') styles.justifyContent = 'flex-end'
-  }
-  return styles
-})
-
-// Localized trigger handle styles (strictly confined to notch width and immediate edge)
-const triggerHandleStyles = computed(() => {
-  if (isHorizontal.value) {
-    const w = containerWidth.value > 0 ? (containerWidth.value + 16) : 320
-    return {
-      width: `${w}px`,
-      maxWidth: '90vw',
-      height: '24px',
-    }
-  } else {
-    const h = containerHeight.value > 0 ? (containerHeight.value + 16) : 320
-    return {
-      height: `${h}px`,
-      maxHeight: '90vh',
-      width: '24px',
-    }
-  }
-})
 
 // Trigger zone classes
 const triggerClasses = computed(() => ({
@@ -302,10 +229,9 @@ function onMouseEnter() {
 function onMouseLeave(e: MouseEvent) {
   if (!autoHide.value) return
   
-  if (hideTimeout) clearTimeout(hideTimeout)
   hideTimeout = setTimeout(() => {
     isHovered.value = false
-  }, 1200)
+  }, 2500)
 }
 
 watch([autoHide, align, position, scale], ([newAutoHide]) => {
@@ -371,7 +297,7 @@ const instanceItems = computed(() => {
   position: relative;
   display: flex;
   z-index: 10;
-  pointer-events: none !important;
+  pointer-events: none;
    /* Let clicks pass through wrapper */
 }
 
@@ -406,66 +332,16 @@ const instanceItems = computed(() => {
   right: 0;
 }
 
-/* Trigger track - transparent container spanning edge to align localized handle strictly with notch */
-.sidebar-trigger-track {
-  position: absolute;
-  pointer-events: none;
-  display: flex;
-  z-index: 101;
-}
-
-.trigger-track--top {
-  top: -24px;
-  left: 0;
-  right: 0;
-  height: 62px;
-  flex-direction: row;
-  align-items: flex-start;
-  padding: 0 22px;
-}
-
-.trigger-track--bottom {
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 42px;
-  flex-direction: row;
-  align-items: flex-end;
-  padding: 0 22px;
-}
-
-.trigger-track--left {
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 42px;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 22px 0;
-}
-
-.trigger-track--right {
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 42px;
-  flex-direction: column;
-  align-items: flex-end;
-  padding: 22px 0;
-}
-
-/* Localized trigger handle - strictly confined to the notch's width/height and position */
+/* Trigger zone - water drop style with hover indicator */
 .sidebar-trigger {
-  position: relative;
+  position: absolute;
   pointer-events: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  background: transparent;
 }
 
-/* Water drop shape - always visible, centered precisely on the localized notch trigger handle */
+/* Water drop shape - always visible */
 .sidebar-trigger::after {
   content: '';
   position: absolute;
@@ -504,6 +380,13 @@ const instanceItems = computed(() => {
   border-radius: 10px 10px 0 0;
 }
 
+.trigger--left {
+  left: 0;
+  top: 58px;
+  bottom: 0;
+  width: 22px;
+}
+
 .trigger--left::after {
   left: 0;
   top: 50%;
@@ -511,6 +394,13 @@ const instanceItems = computed(() => {
   height: 40px;
   border-radius: 0 6px 6px 0;
   transform: translateY(-50%);
+}
+
+.trigger--right {
+  right: 0;
+  top: 58px;
+  bottom: 0;
+  width: 22px;
 }
 
 .trigger--right::after {
@@ -522,6 +412,13 @@ const instanceItems = computed(() => {
   transform: translateY(-50%);
 }
 
+.trigger--top {
+  top: 0;
+  left: 80px; 
+  right: 120px; 
+  height: 52px;
+}
+
 .trigger--top::after {
   top: 0;
   left: 50%;
@@ -529,6 +426,13 @@ const instanceItems = computed(() => {
   height: 6px;
   border-radius: 0 0 6px 6px;
   transform: translateX(-50%);
+}
+
+.trigger--bottom {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 22px;
 }
 
 .trigger--bottom::after {
@@ -546,16 +450,10 @@ const instanceItems = computed(() => {
   display: flex;
   align-items: center;
   padding: 8px;
-  pointer-events: none !important;
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease;
 }
 
 /* Hidden state animations */
-.sidebar-notch--hidden {
-  pointer-events: none !important;
-  visibility: hidden !important;
-}
-
 .sidebar-notch--hidden.sidebar-notch--left {
   transform: translateX(-100%);
   opacity: 0;
