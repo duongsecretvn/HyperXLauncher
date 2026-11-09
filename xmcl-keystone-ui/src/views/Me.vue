@@ -20,7 +20,7 @@ import { vRovingTabindex } from '@/directives/rovingTabindex'
 import { vSharedTooltip } from '@/directives/sharedTooltip'
 import { getInstanceIcon } from '@/util/favicon'
 import { injection } from '@/util/inject'
-import { useFocus, useLocalStorage } from '@vueuse/core'
+import { useElementSize, useFocus, useLocalStorage } from '@vueuse/core'
 import { Instance } from '@xmcl/instance'
 import { Ref, computed, nextTick, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -260,6 +260,14 @@ async function launchInstance(instancePath: string) {
 
 const getInstanceContextMenu = useInstanceContextMenuFunc()
 
+const container = ref<HTMLElement | null>(null)
+const { width: containerWidth } = useElementSize(container)
+
+const carouselHeight = computed(() => {
+  if (!containerWidth.value) return 280
+  return Math.max(220, Math.min(380, Math.round(containerWidth.value * 0.28)))
+})
+
 const filter = ref<HTMLElement | null>(null)
 const { focused } = useFocus(filter)
 useTextFieldBehavior(filter, focused)
@@ -312,7 +320,7 @@ useTutorial(
 
         <div class="news-carousel-wrapper">
           <v-carousel
-            height="280"
+            :height="carouselHeight"
             hide-delimiter-background
             show-arrows-on-hover
             cycle
@@ -338,7 +346,7 @@ useTutorial(
             <v-carousel-item v-for="(item, index) in allNews.slice(0, 8)" :key="index">
               <div class="news-slide" @click="openInBrowser(item.link)">
                 <div class="news-image-wrapper">
-                  <v-img :src="item.image.url" height="280" cover class="news-image">
+                  <v-img :src="item.image.url" :height="carouselHeight" cover class="news-image">
                     <template v-slot:placeholder>
                       <div class="d-flex align-center justify-center fill-height">
                         <v-progress-circular indeterminate color="primary"></v-progress-circular>
@@ -513,19 +521,21 @@ useTutorial(
 }
 
 .classic-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  padding: clamp(16px, 2.5vw, 36px);
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: clamp(20px, 2.5vw, 36px);
+  box-sizing: border-box;
 }
 
 .section-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: clamp(12px, 1.2vw, 18px);
 }
 
 .section-icon {
@@ -533,7 +543,7 @@ useTutorial(
 }
 
 .section-title {
-  font-size: 1.25rem;
+  font-size: clamp(1.15rem, 1.4vw, 1.5rem);
   font-weight: 600;
   margin: 0;
   color: rgba(0, 0, 0, 0.9);
@@ -549,6 +559,7 @@ useTutorial(
 }
 
 .news-carousel-wrapper {
+  width: 100%;
   border-radius: 16px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.03);
@@ -572,7 +583,7 @@ useTutorial(
 
 .news-image-wrapper {
   position: relative;
-  width: 55%;
+  width: clamp(45%, 50vw, 55%);
   flex-shrink: 0;
 }
 
@@ -585,7 +596,7 @@ useTutorial(
   top: 0;
   right: 0;
   bottom: 0;
-  width: 100px;
+  width: clamp(60px, 8vw, 120px);
   background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.9));
 }
 
@@ -595,7 +606,7 @@ useTutorial(
 
 .news-info {
   flex: 1;
-  padding: 24px 32px;
+  padding: clamp(16px, 2vw, 32px);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -610,12 +621,12 @@ useTutorial(
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 12px;
+  margin-bottom: clamp(6px, 0.8vw, 12px);
 }
 
 .news-category {
   color: var(--v-primary-base);
-  font-size: 0.75rem;
+  font-size: clamp(0.7rem, 0.8vw, 0.85rem);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -631,7 +642,7 @@ useTutorial(
 
 .news-date {
   color: rgba(0, 0, 0, 0.5);
-  font-size: 0.75rem;
+  font-size: clamp(0.7rem, 0.8vw, 0.85rem);
 }
 
 .dark .news-date {
@@ -639,10 +650,10 @@ useTutorial(
 }
 
 .news-title {
-  font-size: 1.5rem;
+  font-size: clamp(1.15rem, 1.5vw, 1.7rem);
   font-weight: 700;
   color: rgba(0, 0, 0, 1);
-  margin: 0 0 12px 0;
+  margin: 0 0 clamp(6px, 0.8vw, 12px) 0;
   line-height: 1.3;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -657,9 +668,9 @@ useTutorial(
 
 .news-description {
   color: rgba(0, 0, 0, 0.7);
-  font-size: 0.9rem;
+  font-size: clamp(0.825rem, 0.9vw, 0.95rem);
   line-height: 1.5;
-  margin: 0 0 16px 0;
+  margin: 0 0 clamp(8px, 1vw, 16px) 0;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   line-clamp: 3;
@@ -685,7 +696,8 @@ useTutorial(
 }
 
 .search-field {
-  max-width: 400px;
+  width: 100%;
+  max-width: clamp(320px, 35vw, 600px);
   border-radius: 8px;
 }
 
@@ -693,7 +705,7 @@ useTutorial(
 .time-header {
   display: flex;
   align-items: center;
-  font-size: 1rem;
+  font-size: clamp(0.95rem, 1.1vw, 1.15rem);
   font-weight: 600;
   color: rgba(0, 0, 0, 0.7);
 }
@@ -705,12 +717,12 @@ useTutorial(
 
 .group-title,
 .time-title {
-  font-size: 1rem;
+  font-size: clamp(0.95rem, 1.1vw, 1.15rem);
 }
 
 .group-count {
   margin-left: 8px;
-  font-size: 0.875rem;
+  font-size: clamp(0.8rem, 0.9vw, 0.95rem);
   color: rgba(0, 0, 0, 0.5);
 }
 
@@ -720,8 +732,8 @@ useTutorial(
 
 .instances-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(clamp(260px, 20vw, 360px), 1fr));
+  gap: clamp(10px, 1.2vw, 18px);
 }
 
 /* Mirrors the .v-list-item language: 10px radius, neutral hover bg,
@@ -731,8 +743,9 @@ useTutorial(
 .instance-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: clamp(10px, 1vw, 16px);
+  padding: clamp(10px, 1vw, 16px);
+  min-height: clamp(62px, 5vw, 76px);
   /* radius / border / cursor / transition / hover come from .surface-card-row */
 }
 
@@ -768,7 +781,7 @@ useTutorial(
 .section-header-item {
   display: flex;
   align-items: center;
-  font-size: 1rem;
+  font-size: clamp(0.95rem, 1.1vw, 1.15rem);
   font-weight: 600;
   color: rgba(0, 0, 0, 0.7);
 }
@@ -778,12 +791,12 @@ useTutorial(
 }
 
 .section-title-item {
-  font-size: 1rem;
+  font-size: clamp(0.95rem, 1.1vw, 1.15rem);
 }
 
 .section-count {
   margin-left: 8px;
-  font-size: 0.875rem;
+  font-size: clamp(0.8rem, 0.9vw, 0.95rem);
   color: rgba(0, 0, 0, 0.5);
 }
 
@@ -791,12 +804,18 @@ useTutorial(
   color: rgba(255, 255, 255, 0.5);
 }
 
+.instance-name {
+  font-size: clamp(0.875rem, 0.95vw, 1.05rem);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
 .dark .sectionnce-name {
   color: rgba(255, 255, 255, 0.9);
 }
 
 .instance-version {
-  font-size: 0.8rem;
+  font-size: clamp(0.75rem, 0.8vw, 0.875rem);
   color: rgba(0, 0, 0, 0.5);
 }
 
