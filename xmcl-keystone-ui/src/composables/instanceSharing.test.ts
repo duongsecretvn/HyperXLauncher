@@ -39,6 +39,7 @@ describe('instance sharing scope', () => {
         quiltLoader: '',
         optifine: '',
         labyMod: '',
+        rust: '',
       },
       files,
       fingerprint: 'full-instance',

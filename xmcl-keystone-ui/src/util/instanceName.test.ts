@@ -10,6 +10,7 @@ const rt = (overrides: Partial<RuntimeVersions>): RuntimeVersions => ({
   quiltLoader: '',
   optifine: '',
   labyMod: '',
+  rust: '',
   ...overrides,
 })
 

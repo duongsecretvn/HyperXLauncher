@@ -16,6 +16,9 @@ export function generateBaseName(runtime: RuntimeVersions) {
   if (runtime.optifine) {
     name += `-optifine${runtime.optifine}`
   }
+  if (runtime.rust) {
+    name += `-rust`
+  }
   return name
 }
 

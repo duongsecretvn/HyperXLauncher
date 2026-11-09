@@ -208,8 +208,9 @@ export function isCompatible(range: string, version: string) {
   return vRange?.containsVersion(parseVersion(version)) || false
 }
 
-export function getExpectVersion({ minecraft, forge, fabricLoader: fabric, optifine, quiltLoader, neoForged, labyMod }: PartialRuntimeVersions) {
+export function getExpectVersion({ minecraft, forge, fabricLoader: fabric, optifine, quiltLoader, neoForged, labyMod, rust }: PartialRuntimeVersions) {
   let expectedId = minecraft
+  if (typeof rust === 'string' && rust.length > 0) expectedId += `-rust${rust}`
   if (typeof forge === 'string' && forge.length > 0) expectedId += `-forge${forge}`
   if (typeof fabric === 'string' && fabric.length > 0) expectedId += `-fabric${fabric}`
   if (typeof optifine === 'string' && optifine.length > 0) expectedId += `-optifine_${optifine}`
@@ -409,6 +410,7 @@ export interface VersionHeader {
   quilt: string
 
   labyMod: string
+  rust?: string
 }
 
 export type ServerVersionHeader = {

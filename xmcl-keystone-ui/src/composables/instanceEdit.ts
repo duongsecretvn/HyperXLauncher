@@ -602,6 +602,12 @@ export function useInstanceEditVersions(
       }
     }
   }
+  function onSelectRust(version: string) {
+    if (data.runtime) {
+      const runtime = data.runtime as Record<string, string>
+      runtime.rust = version
+    }
+  }
   function onSelectLocalVersion(version: string) {
     data.version = version
     const v = versions.value.find((ver) => ver.id === version)
@@ -626,6 +632,7 @@ export function useInstanceEditVersions(
     onSelectQuilt,
     onSelectOptifine,
     onSelectLabyMod,
+    onSelectRust,
     onSelectLocalVersion,
   }
 }

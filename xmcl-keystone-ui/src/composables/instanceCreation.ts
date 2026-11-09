@@ -147,6 +147,7 @@ export function useInstanceCreation(gameProfile: Ref<GameProfile>, instances: Re
     quiltLoader: '',
     neoForged: '',
     labyMod: '',
+    rust: '',
   })
   const data = reactive<InstanceData>({
     name: '',

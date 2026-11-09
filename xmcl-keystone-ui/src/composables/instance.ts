@@ -14,6 +14,7 @@ const EMPTY_INSTANCE: Instance = {
     neoForged: '',
     optifine: '',
     labyMod: '',
+    rust: '',
   },
   lastAccessDate: 0,
   lastPlayedDate: 0,

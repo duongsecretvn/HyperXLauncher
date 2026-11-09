@@ -22,7 +22,7 @@ import { AnyError, isSystemError } from '@xmcl/utils'
 import filenamify from 'filenamify'
 import { fileTypeFromBuffer, fileTypeFromFile } from 'file-type'
 import { existsSync } from 'fs'
-import { ensureDir, readdir, readlink, readJson, rename, rm, writeFile, writeJson } from 'fs-extra'
+import { copyFile, ensureDir, readdir, readlink, readJson, rename, rm, writeFile, writeJson } from 'fs-extra'
 import { basename, dirname, extname, isAbsolute, join, relative, resolve } from 'path'
 import { Inject, LauncherAppKey, kGameDataPath, type PathResolver } from '~/app'
 import { ImageStorage, kTasks, Tasks } from '~/infra'
@@ -338,6 +338,37 @@ export class InstanceService extends StatefulService<InstanceState> implements I
       }
       if (forceFolder || payload.shaderpacks) {
         await ensureDir(join(instance.path, 'shaderpacks')).catch(() => undefined)
+      }
+      if (instance.runtime.rust || instance.runtime.fabricLoader || instance.runtime.minecraft === '1.21.11') {
+        const modsDir = join(instance.path, 'mods')
+        await ensureDir(modsDir).catch(() => undefined)
+        if (instance.runtime.rust || instance.runtime.fabricLoader) {
+          try {
+            const mcDir = this.app.minecraftDataPath
+            const versionsDir = join(mcDir, 'versions')
+            if (await exists(versionsDir)) {
+              const entries = await readdir(versionsDir)
+              for (const vName of entries) {
+                if (vName.toLowerCase().includes('boosted fps') || vName.toLowerCase().includes('fabric-1.21.11')) {
+                  const candidateMods = join(versionsDir, vName, 'mods')
+                  if (await exists(candidateMods)) {
+                    const mFiles = await readdir(candidateMods)
+                    for (const m of mFiles) {
+                      if (m.toLowerCase().includes('sodium') || m.toLowerCase().includes('fabric-api') || m.toLowerCase().includes('lithium') || m.toLowerCase().includes('iris')) {
+                        const target = join(modsDir, m)
+                        if (!(await exists(target))) {
+                          await copyFile(join(candidateMods, m), target).catch(() => undefined)
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          } catch (e) {
+            this.warn(`Failed to auto-provision sodium / fabric-api mods: ${e}`)
+          }
+        }
       }
     }
 

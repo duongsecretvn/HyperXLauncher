@@ -18,6 +18,8 @@ export const RuntimeVersionsSchema = z
     optifine: z.string().catch('').default(''),
     /** The labyMod version */
     labyMod: z.string().catch('').default(''),
+    /** The Rust / Horizon Core version */
+    rust: z.string().catch('').default(''),
   })
 
 export type RuntimeVersions = z.infer<typeof RuntimeVersionsSchema>
@@ -231,6 +233,7 @@ export const InstanceDataSchema = z.object({
     quiltLoader: '',
     neoForged: '',
     labyMod: '',
+    rust: '',
   }).default({
     minecraft: '',
     forge: '',
@@ -239,6 +242,7 @@ export const InstanceDataSchema = z.object({
     quiltLoader: '',
     neoForged: '',
     labyMod: '',
+    rust: '',
   }),
   /** The java path on the disk */
   java: z

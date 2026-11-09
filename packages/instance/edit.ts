@@ -43,6 +43,7 @@ export const EditInstanceOptionsSchema = InstanceSchema.extend({
     quiltLoader: true,
     optifine: true,
     labyMod: true,
+    rust: true,
   }),
 }).partial()
 

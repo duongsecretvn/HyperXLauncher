@@ -39,6 +39,7 @@ function createInstance(path: string): Instance {
       quiltLoader: '',
       neoForged: '',
       labyMod: '',
+      rust: '',
     },
     icon: '',
     url: '',

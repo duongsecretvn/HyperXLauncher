@@ -17,6 +17,9 @@
       </v-card>
     </div>
 
+    <!-- Version Core -->
+    <div class="text-sm font-bold opacity-70 my-4">Version Core</div>
+
     <!-- Versions -->
     <VersionInputMinecraft
       v-if="showMinecraft"
@@ -25,6 +28,13 @@
       :value="data.runtime.minecraft"
       :versions="versions"
       @input="onSelectMinecraft"
+    />
+    <VersionInputRust
+      v-if="showMinecraft"
+      data-testid="version-input-rust"
+      class="mb-4"
+      :value="data.runtime.rust"
+      @input="onSelectRust"
     />
     <v-expand-transition>
       <div v-if="currentTab !== 'vanilla'">
@@ -104,6 +114,7 @@ import VersionInputMinecraft from '@/components/VersionInputMinecraft.vue'
 import VersionInputNeoForged from '@/components/VersionInputNeoForged.vue'
 import VersionInputOptifine from '@/components/VersionInputOptifine.vue'
 import VersionInputQuilt from '@/components/VersionInputQuilt.vue'
+import VersionInputRust from '@/components/VersionInputRust.vue'
 import { useInstanceEditVersions } from '@/composables/instanceEdit'
 import { BuiltinImages } from '@/constant'
 import { VersionHeader } from '@xmcl/runtime-api'
@@ -136,6 +147,7 @@ const {
   onSelectQuilt,
   onSelectOptifine,
   onSelectLabyMod,
+  onSelectRust,
   onSelectLocalVersion,
 } = useInstanceEditVersions(props.data, versions)
 

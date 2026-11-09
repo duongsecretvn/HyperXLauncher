@@ -12,6 +12,7 @@ import craftingTable from '@/assets/craftingtable.webp'
 import oculus from '@/assets/oculus.webp'
 import prism from '@/assets/prism.png'
 import bedrock from '@/assets/LargeLogo.png'
+import rust from '@/assets/rust.png'
 
 export const BuiltinImages = {
   minecraft,
@@ -28,5 +29,6 @@ export const BuiltinImages = {
   oculus,
   prism,
   bedrock,
+  rust,
 }
 
