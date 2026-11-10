@@ -1,0 +1,15 @@
+[package]
+name = "hyperx-core-assets"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+hyperx-core-types = { path = "../hyperx-core-types" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+image = { workspace = true }
+glam = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }

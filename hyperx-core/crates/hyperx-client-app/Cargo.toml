@@ -1,0 +1,27 @@
+[package]
+name = "hyperx-client-app"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[[bin]]
+name = "hyperx-core"
+path = "src/main.rs"
+
+[dependencies]
+hyperx-core-types = { path = "../hyperx-core-types" }
+hyperx-core-protocol = { path = "../hyperx-core-protocol" }
+hyperx-core-world = { path = "../hyperx-core-world" }
+hyperx-core-render = { path = "../hyperx-core-render" }
+hyperx-core-assets = { path = "../hyperx-core-assets" }
+tokio = { workspace = true }
+clap = { workspace = true }
+log = { workspace = true }
+env_logger = { workspace = true }
+glam = { workspace = true }
+uuid = { workspace = true }
+pollster = { workspace = true }
+wgpu = { workspace = true }
+winit = { workspace = true }
+bytemuck = { workspace = true }

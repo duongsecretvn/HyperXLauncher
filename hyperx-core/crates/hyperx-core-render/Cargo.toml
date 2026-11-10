@@ -1,0 +1,19 @@
+[package]
+name = "hyperx-core-render"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+
+[dependencies]
+hyperx-core-types = { path = "../hyperx-core-types" }
+hyperx-core-world = { path = "../hyperx-core-world" }
+winit = { workspace = true }
+wgpu = { workspace = true }
+glam = { workspace = true }
+bytemuck = { workspace = true }
+image = { workspace = true }
+parking_lot = { workspace = true }
+crossbeam-channel = { workspace = true }
+thiserror = { workspace = true }
+log = { workspace = true }
