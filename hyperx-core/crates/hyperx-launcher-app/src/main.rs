@@ -1,5 +1,6 @@
 use hyperx_launcher_app::ipc::{IpcDispatcher, IpcRequest};
 use hyperx_launcher_app::vibrancy;
+use include_dir::{include_dir, Dir};
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::Arc;
@@ -10,8 +11,10 @@ use tao::window::WindowBuilder;
 use wry::http::{Request, Response, StatusCode};
 use wry::WebViewBuilder;
 
+// Embed the entire pre-compiled Vue 3 frontend inside the binary for a 100% standalone executable
+static EMBEDDED_DIST: Dir<'_> = include_dir!("$CARGO_MANIFEST_DIR/../../../xmcl-keystone-ui/dist");
+
 fn find_dist_dir() -> PathBuf {
-    // Try current dir first, then relative paths
     let candidates = [
         PathBuf::from("xmcl-keystone-ui/dist"),
         PathBuf::from("../xmcl-keystone-ui/dist"),
@@ -25,7 +28,6 @@ fn find_dist_dir() -> PathBuf {
         }
     }
 
-    // Fallback: look relative to current exe
     if let Ok(exe) = std::env::current_exe() {
         if let Some(parent) = exe.parent() {
             let p = parent.join("dist");
@@ -59,7 +61,7 @@ fn get_mime_type(path: &Path) -> &'static str {
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     env_logger::Builder::from_env(env_logger::Env::default().default_filter_or("info")).init();
-    log::info!("Starting HyperXLauncher (100% Native Rust Engine)...");
+    log::info!("Starting HyperXLauncher (100% Native Rust Standalone Engine)...");
 
     let event_loop = EventLoop::new();
 
@@ -79,39 +81,46 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let dispatcher = Arc::new(IpcDispatcher::new(app_data_dir));
 
     let dist_dir = find_dist_dir();
-    log::info!("Serving UI assets from: {}", dist_dir.display());
-
     let dist_dir_for_protocol = dist_dir.clone();
 
-    // Custom protocol "hyperx://" serving frontend assets
+    // Custom protocol "hyperx://" serving frontend assets (hybrid: disk with embedded fallback)
     let custom_protocol = move |request: Request<Vec<u8>>| {
         let uri = request.uri().path();
         let relative_path = uri.trim_start_matches('/');
-        let file_path = if relative_path.is_empty() || relative_path == "index.html" {
-            dist_dir_for_protocol.join("index.html")
+        let path_to_lookup = if relative_path.is_empty() || relative_path == "index.html" {
+            "index.html"
         } else {
-            dist_dir_for_protocol.join(relative_path)
+            relative_path
         };
 
-        if file_path.exists() && file_path.is_file() {
-            if let Ok(bytes) = fs::read(&file_path) {
-                let mime = get_mime_type(&file_path);
-                return Response::builder()
-                    .header("Content-Type", mime)
-                    .header("Access-Control-Allow-Origin", "*")
-                    .header("Cache-Control", "public, max-age=3600")
-                    .body(bytes.into())
-                    .unwrap();
+        // 1. Try disk if external dist folder exists
+        if dist_dir_for_protocol.exists() {
+            let file_path = dist_dir_for_protocol.join(path_to_lookup);
+            if file_path.exists() && file_path.is_file() {
+                if let Ok(bytes) = fs::read(&file_path) {
+                    let mime = get_mime_type(&file_path);
+                    return Response::builder()
+                        .header("Content-Type", mime)
+                        .header("Access-Control-Allow-Origin", "*")
+                        .header("Cache-Control", "public, max-age=3600")
+                        .body(bytes.into())
+                        .unwrap();
+                }
             }
         }
 
-        // SPA fallback: return index.html for unknown routes
-        let index_path = dist_dir_for_protocol.join("index.html");
-        if let Ok(bytes) = fs::read(&index_path) {
+        // 2. Load directly from embedded binary assets (100% standalone single-file .exe)
+        let file = EMBEDDED_DIST
+            .get_file(path_to_lookup)
+            .or_else(|| EMBEDDED_DIST.get_file("index.html"));
+
+        if let Some(f) = file {
+            let mime = get_mime_type(Path::new(f.path()));
             return Response::builder()
-                .header("Content-Type", "text/html; charset=utf-8")
+                .header("Content-Type", mime)
                 .header("Access-Control-Allow-Origin", "*")
-                .body(bytes.into())
+                .header("Cache-Control", "public, max-age=3600")
+                .body(f.contents().to_vec().into())
                 .unwrap();
         }
 
