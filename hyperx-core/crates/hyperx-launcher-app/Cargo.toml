@@ -1,0 +1,30 @@
+[package]
+name = "hyperx-launcher-app"
+version = "1.0.0"
+edition = "2021"
+authors = ["HyperXLauncher Team <duongsecretvn@gmail.com>"]
+description = "100% Native Rust Desktop Launcher for HyperXLauncher"
+
+[dependencies]
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+log = { workspace = true }
+env_logger = { workspace = true }
+parking_lot = { workspace = true }
+thiserror = { workspace = true }
+uuid = { workspace = true }
+
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "stream"] }
+rayon = "1.10"
+smallvec = { version = "1.13", features = ["serde"] }
+base64 = "0.22"
+sha1 = "0.10"
+sha2 = "0.10"
+walkdir = "2.5"
+window-vibrancy = "0.5"
+raw-window-handle = "0.6"
+flate2 = "1.0"
+zip = { version = "2.2", default-features = false, features = ["deflate"] }
+wry = "0.44"
+tao = { version = "0.30", features = ["rwh_06"] }
