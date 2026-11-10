@@ -36,6 +36,14 @@
       :value="data.runtime.rust"
       @input="onSelectRust"
     />
+    <VersionInputLocal
+      v-if="showLocal"
+      class="mb-4"
+      :value="data.version"
+      :versions="versions"
+      :placeholder="localPlaceholder"
+      @input="onSelectLocalVersion"
+    />
     <v-expand-transition>
       <div v-if="currentTab !== 'vanilla'">
         <VersionInputNeoForged
@@ -93,15 +101,6 @@
         />
       </div>
     </v-expand-transition>
-
-    <VersionInputLocal
-      v-if="showLocal"
-      class="mt-4"
-      :value="data.version"
-      :versions="versions"
-      :placeholder="localPlaceholder"
-      @input="onSelectLocalVersion"
-    />
   </div>
 </template>
 

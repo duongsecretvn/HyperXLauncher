@@ -810,7 +810,7 @@ useTutorial(
   line-height: 1.25;
 }
 
-.dark .sectionnce-name {
+.dark .instance-name {
   color: rgba(255, 255, 255, 0.9);
 }
 
