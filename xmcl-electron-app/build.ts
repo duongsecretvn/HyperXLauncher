@@ -72,6 +72,10 @@ async function buildMain(
   const time = ((Date.now() - startTime) / 1000).toFixed(2)
   if (!slient) console.log(`Build completed in ${time}s.`)
   await copy(path.join(__dirname, '../xmcl-keystone-ui/dist'), path.join(__dirname, './dist/renderer'))
+  const rustCoreBin = path.join(__dirname, '../hyperx-core/target/x86_64-pc-windows-gnullvm/release/hyperx-core.exe')
+  if (existsSync(rustCoreBin)) {
+    await copyFile(rustCoreBin, join(__dirname, 'dist', 'hyperx-core.exe')).catch(() => undefined)
+  }
   if (!slient) console.log('\n')
   return time
 }
