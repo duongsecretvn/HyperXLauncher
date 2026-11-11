@@ -2,7 +2,7 @@
     "name": "HyperXLauncher",
     "private": true,
     "main": "./index.js",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "author": "duongsecretvn <duongsecretvn@gmail.com>",
     "description": "HyperXLauncher - Modern & Optimized Minecraft Launcher",
     "license": "MIT",

@@ -253,9 +253,9 @@ itself failed.
 ## HyperXLauncher Test Build & Desktop Setup Delivery Rule (PERMANENT)
 
 Whenever asked to modify/fix and build a release for testing:
-1. Always keep the version as `1.0.0` (as this is for testing).
+1. Always keep the version as `1.0.1` (unless instructed otherwise).
 2. Automatically remove any old `.setup` installer (`*Setup*.exe`) from the user's Desktop (`C:\Users\Admin\OneDrive\Desktop`).
-3. Copy/transfer the newly built `.setup` file (`HyperXLauncher-Setup-1.0.0.exe`) onto the Desktop.
+3. Copy/transfer the newly built `.setup` file (`HyperXLauncher-Setup-1.0.1.exe`) onto the Desktop.
 4. Git operations must strictly target repository: `https://github.com/duongsecretvn/HyperXLauncher`.
-5. Automatically delete any extra/auxiliary files (such as `source HyperXLauncher.zip`, `.zip`, `.appx`, `.blockmap`, etc.) from Desktop and output locations so ONLY the clean `HyperXLauncher-Setup-1.0.0.exe` installer is placed on Desktop without extra clutter.
+5. Automatically delete any extra/auxiliary files (such as `source HyperXLauncher.zip`, `.zip`, `.appx`, `.blockmap`, etc.) from Desktop and output locations so ONLY the clean `HyperXLauncher-Setup-1.0.1.exe` installer is placed on Desktop without extra clutter.
 

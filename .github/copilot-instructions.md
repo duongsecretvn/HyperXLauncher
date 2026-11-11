@@ -62,9 +62,9 @@ When a scratch spec is warranted:
 ## HyperXLauncher Test Build & Desktop Delivery Rule (PERMANENT)
 
 Whenever asked to modify/fix and build a release for testing:
-1. Always keep the version as `1.0.0` (for testing purposes).
+1. Always keep the version as `1.0.1` (unless instructed otherwise).
 2. Automatically delete any old `.setup` installer (`*Setup*.exe`) from Desktop (`C:\Users\Admin\OneDrive\Desktop`).
-3. Copy/transfer the newly built `.setup` file (`HyperXLauncher-Setup-1.0.0.exe`) to Desktop.
+3. Copy/transfer the newly built `.setup` file (`HyperXLauncher-Setup-1.0.1.exe`) to Desktop.
 4. Strictly use GitHub repository `https://github.com/duongsecretvn/HyperXLauncher`.
-5. Automatically delete any extra/auxiliary files (such as `source HyperXLauncher.zip`, `.zip`, `.appx`, `.blockmap`, etc.) from Desktop and output locations so ONLY the clean `HyperXLauncher-Setup-1.0.0.exe` installer is placed on Desktop without extra clutter.
+5. Automatically delete any extra/auxiliary files (such as `source HyperXLauncher.zip`, `.zip`, `.appx`, `.blockmap`, etc.) from Desktop and output locations so ONLY the clean `HyperXLauncher-Setup-1.0.1.exe` installer is placed on Desktop without extra clutter.
 
