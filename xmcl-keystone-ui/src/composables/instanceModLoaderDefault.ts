@@ -10,37 +10,39 @@ export function useInstanceModLoaderDefault() {
   async function apply(path: string, runtime: RuntimeVersions, loaders: Array<'forge' | 'quilt' | 'neoforge' | 'fabric' | string>) {
     for (const loader of loaders) {
       if (loader === 'fabric') {
-        const { gameVersions, loaderVersions } = await metadata.getFabricVersions()
+        const { gameVersions, loaderVersions } = await metadata.getFabricVersions().catch(() => ({ gameVersions: [] as string[], loaderVersions: [] }))
         if (gameVersions.includes(runtime.minecraft)) {
           const version = loaderVersions[0]
-          await editInstance({
-            instancePath: path,
-            runtime: {
-              ...runtime,
-              fabricLoader: version.version,
-            },
-            version: '',
-          })
-          return true
+          if (version) {
+            await editInstance({
+              instancePath: path,
+              runtime: {
+                ...runtime,
+                fabricLoader: version.version,
+              },
+              version: '',
+            })
+            return true
+          }
         }
-        return false
       } else if (loader === 'quilt') {
-        const { gameVersions, loaderVersions } = await metadata.getQuiltVersions()
+        const { gameVersions, loaderVersions } = await metadata.getQuiltVersions().catch(() => ({ gameVersions: [] as string[], loaderVersions: [] }))
         if (gameVersions.includes(runtime.minecraft)) {
           const version = loaderVersions[0]
-          await editInstance({
-            instancePath: path,
-            runtime: {
-              ...runtime,
-              quiltLoader: version.version,
-            },
-            version: '',
-          })
-          return true
+          if (version) {
+            await editInstance({
+              instancePath: path,
+              runtime: {
+                ...runtime,
+                quiltLoader: version.version,
+              },
+              version: '',
+            })
+            return true
+          }
         }
-        return false
       } else if (loader === 'forge') {
-        const forges = await metadata.getForgeVersions(runtime.minecraft)
+        const forges = await metadata.getForgeVersions(runtime.minecraft).catch(() => [])
         const version = forges.find(f => f.type === 'recommended') || forges[0]
         if (version) {
           await editInstance({
@@ -53,9 +55,8 @@ export function useInstanceModLoaderDefault() {
           })
           return true
         }
-        return false
       } else if (loader === 'neoforge') {
-        const versions = await metadata.getNeoForgedVersions(runtime.minecraft)
+        const versions = await metadata.getNeoForgedVersions(runtime.minecraft).catch(() => [])
         const version = getLatestNeoforge(versions)
         if (version) {
           await editInstance({
@@ -68,13 +69,12 @@ export function useInstanceModLoaderDefault() {
           })
           return true
         }
-        return false
       } else if (loader === 'minecraft') {
         return true
       }
     }
 
-    return true
+    return false
   }
 
   return apply

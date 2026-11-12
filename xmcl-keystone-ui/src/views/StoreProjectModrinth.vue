@@ -13,8 +13,10 @@ import { usePresence } from '@/composables/presence'
 import { kSWRVConfig } from '@/composables/swrvConfig'
 import { useTasks } from '@/composables/task'
 import { clientModrinthV2 } from '@/util/clients'
+import { isNoModLoader } from '@/util/isNoModloader'
 import { injection } from '@/util/inject'
-import { TaskState, ProjectMapping, ProjectMappingServiceKey } from '@xmcl/runtime-api'
+import { TaskState, ProjectMapping, ProjectMappingServiceKey, InstanceInstallServiceKey, InstanceModsServiceKey, InstanceResourcePacksServiceKey, InstanceShaderPacksServiceKey, MarketType } from '@xmcl/runtime-api'
+import { useInstanceModLoaderDefault } from '@/composables/instanceModLoaderDefault'
 import useSWRV from 'swrv'
 import { useI18nSearchFlights } from '@/composables/flights'
 import { useAutoI18nCommunityContent } from '@/composables/i18n'
@@ -138,13 +140,55 @@ const { versions, error } = useModrinthVersions(computed(() => props.id))
 
 const _installing = ref(false)
 const { notify } = useNotifier()
-const onInstall = (v: StoreProjectVersion) => {
+const installDefaultModLoader = useInstanceModLoaderDefault()
+const { installInstanceFiles } = useService(InstanceInstallServiceKey)
+const modService = useService(InstanceModsServiceKey)
+const resourcePackService = useService(InstanceResourcePacksServiceKey)
+const shaderPackService = useService(InstanceShaderPacksServiceKey)
+
+const onInstall = async (v: StoreProjectVersion) => {
+  if (!proj.value) return
   _installing.value = true
-  installModpack({ projectId: proj.value!.id, versionId: v.id, icon: project.value?.iconUrl, market: 0 }).catch((e) => {
-    notify({ level: 'error', title: e.message })
-  }).finally(() => {
+  try {
+    if (proj.value.project_type === 'modpack') {
+      await installModpack({ projectId: proj.value.id, versionId: v.id, icon: project.value?.iconUrl, market: 0 })
+    } else {
+      const targetInstance = instances.value.find(i => i.path === selectedInstance.value) || instances.value[0]
+      if (!targetInstance) {
+        notify({ level: 'warning', title: t('instance.noInstance') || 'No Minecraft instance found. Please create one first.' })
+        return
+      }
+
+      const domain = proj.value.project_type === 'shader' ? 'shaderpacks'
+        : proj.value.project_type === 'resourcepack' ? 'resourcepacks'
+        : 'mods'
+
+      const service = proj.value.project_type === 'shader' ? shaderPackService
+        : proj.value.project_type === 'resourcepack' ? resourcePackService
+        : modService
+
+      if (domain === 'mods' && isNoModLoader(targetInstance.runtime)) {
+        await installDefaultModLoader(targetInstance.path, targetInstance.runtime, v.loaders)
+      }
+
+      const files = await service.resolveFromMarket({
+        market: MarketType.Modrinth,
+        version: [{ versionId: v.id, icon: project.value?.iconUrl }],
+        instancePath: targetInstance.path,
+      })
+
+      await installInstanceFiles({
+        path: targetInstance.path,
+        files,
+        oldFiles: [],
+      })
+      notify({ level: 'success', title: `${project.value?.title || 'Project'} installed!` })
+    }
+  } catch (e: any) {
+    notify({ level: 'error', title: e.message || 'Installation failed' })
+  } finally {
     _installing.value = false
-  })
+  }
 }
 
 const { instances, selectedInstance } = injection(kInstances)

@@ -81,10 +81,10 @@
       <FilterCard
         title="Mods & Packs"
         :items="modsAndPacksList"
-        :selected="selectedProjectType ? [selectedProjectType] : []"
-        :selected-count="selectedProjectType ? 1 : 0"
+        :selected="selectedProjectTypes"
+        :selected-count="selectedProjectTypes.length"
         @toggle="toggleProjectType"
-        @clear="selectedProjectType = ''"
+        @clear="selectedProjectTypes = []"
       />
 
       <!-- ModLoaders -->
@@ -353,7 +353,11 @@ function ensureQuery(query: Record<string, string | (string | null)[] | null | u
 
 const query = useQuery('query', ensureQuery)
 const gameVersion = useQuery('gameVersion', ensureQuery)
-const selectedProjectType = useQuery('projectType', ensureQuery)
+const selectedProjectTypes = useQueryStringArray('projectTypes', ensureQuery)
+const selectedProjectTypeLegacy = useQuery('projectType', ensureQuery)
+if (selectedProjectTypeLegacy.value && !selectedProjectTypes.value.includes(selectedProjectTypeLegacy.value)) {
+  selectedProjectTypes.value = [...selectedProjectTypes.value, selectedProjectTypeLegacy.value]
+}
 const modLoaders = useQueryStringArray('modLoaders', ensureQuery)
 const sortQuery = useQuery('sort', ensureQuery)
 const sort = computed({
@@ -400,10 +404,10 @@ const modsAndPacksList = [
 ]
 
 function toggleProjectType(id: string) {
-  if (selectedProjectType.value === id) {
-    selectedProjectType.value = ''
+  if (selectedProjectTypes.value.includes(id)) {
+    selectedProjectTypes.value = selectedProjectTypes.value.filter((t) => t !== id)
   } else {
-    selectedProjectType.value = id
+    selectedProjectTypes.value = [...selectedProjectTypes.value, id]
   }
 }
 
@@ -421,7 +425,7 @@ const { items, isSearching, searchError, pageCount, sources } = useSearchedItems
   omitSources,
   modrinthCategories: _modrinthCategories,
   curseforgeCategory,
-  projectType: selectedProjectType,
+  projectTypes: selectedProjectTypes,
   pageSize,
   tCategory,
 })
@@ -480,19 +484,9 @@ const {
   gameVersions,
 } = injection(kModrinthTags)
 const { categories: curseforgeCategories } = injection(kCurseforgeCategories)
-const catModLoaders = computed(() => {
-  const pt = selectedProjectType.value
-  if (pt === 'modpack') {
-    return modrinthModloaders.value.filter((v) => v.supported_project_types.includes('modpack'))
-  }
-  if (pt === 'mod') {
-    return modrinthModloaders.value.filter((v) => v.supported_project_types.includes('mod'))
-  }
-  if (pt === 'shader') {
-    return modrinthModloaders.value.filter((v) => v.supported_project_types.includes('shader'))
-  }
-  return modrinthModloaders.value.filter((v) => v.supported_project_types.includes('modpack') || v.supported_project_types.includes('mod'))
-})
+const catModLoaders = computed(() =>
+  modrinthModloaders.value.filter((v) => v.supported_project_types.includes('modpack')),
+)
 
 const enter = (type: string, id: string) => {
   push(`/store/${type}/${id}`)
@@ -565,8 +559,17 @@ const activeTags = computed(() => {
   const tags: {
     id: string
     text: string
-    type: 'source' | 'version' | 'sort' | 'loader' | 'category'
+    type: 'source' | 'version' | 'sort' | 'loader' | 'category' | 'projectType'
   }[] = []
+
+  selectedProjectTypes.value.forEach((pt) => {
+    const item = modsAndPacksList.find((x) => x.id === pt)
+    tags.push({
+      id: pt,
+      text: item?.text || pt,
+      type: 'projectType',
+    })
+  })
 
   omitSources.value.forEach((s) =>
     tags.push({ id: s, text: sourcesList.find((x) => x.id === s)?.text || s, type: 'source' }),
@@ -606,6 +609,9 @@ const activeTags = computed(() => {
 const selectedCount = computed(() => activeTags.value.length)
 
 function removeTag(tag: typeof activeTags.value[number]) {
+  if (tag.type === 'projectType') {
+    selectedProjectTypes.value = selectedProjectTypes.value.filter((pt) => pt !== tag.id)
+  }
   if (tag.type === 'sort') {
     replace({ query: { ...route.query, sort: undefined, sortOrder: undefined, page: '1' } })
   }
@@ -619,11 +625,14 @@ function removeTag(tag: typeof activeTags.value[number]) {
 }
 
 function clearAllFilters() {
+  selectedProjectTypes.value = []
   replace({
     query: {
       ...route.query,
       omitSources: undefined,
       gameVersion: undefined,
+      projectTypes: undefined,
+      projectType: undefined,
       modLoaders: undefined,
       modrinthCategories: undefined,
       curseforgeCategory: undefined,

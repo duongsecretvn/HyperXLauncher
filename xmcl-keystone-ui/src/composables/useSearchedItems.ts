@@ -23,6 +23,7 @@ interface UseSearchedItemsOptions {
   omitSources: Ref<string[]>
   modrinthCategories: Ref<string[]>
   curseforgeCategory: Ref<number | undefined>
+  projectTypes?: Ref<string[]>
   projectType?: Ref<string>
   pageSize: number
   tCategory: (key: string) => string
@@ -38,6 +39,7 @@ export function useSearchedItems(options: UseSearchedItemsOptions) {
     omitSources,
     modrinthCategories,
     curseforgeCategory,
+    projectTypes,
     projectType,
     pageSize,
     tCategory,
@@ -49,17 +51,27 @@ export function useSearchedItems(options: UseSearchedItemsOptions) {
   const sources = computed(() => getStoreSources(omitSources.value, modrinthCategories.value, curseforgeCategory.value))
   const config = injection(kSWRVConfig)
 
+  const activeProjectTypes = computed(() => {
+    if (projectTypes?.value && projectTypes.value.length > 0) {
+      return projectTypes.value
+    }
+    if (projectType?.value) {
+      return [projectType.value]
+    }
+    return []
+  })
+
   // FTB
   const { refreshing: ftbLoading, data: ftbData } = useFeedTheBeast(reactive({ keyword: query }))
 
   // FTB
   type StoreProject = ExploreProjectModern & { sortMetrics: StoreSortMetrics }
   const ftbItems = shallowRef<StoreProject[]>([])
-  watch([ftbData, page, projectType || ref('')], async ([packs, pageNum, pt], _, onCleanup) => {
+  watch([ftbData, page, activeProjectTypes], async ([packs, pageNum, types], _, onCleanup) => {
     let cancelled = false
     onCleanup(() => { cancelled = true })
     ftbItems.value = []
-    if (pt && pt !== 'modpack' && pt !== 'modpacks') {
+    if (types.length > 0 && !types.some(t => t === 'modpack' || t === 'modpacks')) {
       return
     }
     if (!packs) {
@@ -100,19 +112,26 @@ export function useSearchedItems(options: UseSearchedItemsOptions) {
   }, { immediate: true })
 
   const modrinthProjectType = computed(() => {
-    const pt = projectType?.value
-    if (!pt) return ''
-    if (pt === 'modpack' || pt === 'modpacks') return 'modpack'
-    if (pt === 'mod' || pt === 'mods') return 'mod'
-    if (pt === 'resourcepack' || pt === 'resourcepacks') return 'resourcepack'
-    if (pt === 'datapack' || pt === 'datapacks') return 'datapack'
-    if (pt === 'shader' || pt === 'shaders') return 'shader'
-    return pt
+    const types = activeProjectTypes.value
+    if (types.length === 0) return ''
+    const normalize = (pt: string) => {
+      if (pt === 'modpack' || pt === 'modpacks') return 'modpack'
+      if (pt === 'mod' || pt === 'mods') return 'mod'
+      if (pt === 'resourcepack' || pt === 'resourcepacks') return 'resourcepack'
+      if (pt === 'datapack' || pt === 'datapacks') return 'datapack'
+      if (pt === 'shader' || pt === 'shaders') return 'shader'
+      return pt
+    }
+    if (types.length === 1) {
+      return normalize(types[0])
+    }
+    return types.map(normalize)
   })
 
   const curseforgeClassId = computed(() => {
-    const pt = projectType?.value
-    if (!pt) return undefined
+    const types = activeProjectTypes.value
+    if (types.length !== 1) return undefined
+    const pt = types[0]
     if (pt === 'modpack' || pt === 'modpacks') return CurseforgeBuiltinClassId.modpack
     if (pt === 'mod' || pt === 'mods') return CurseforgeBuiltinClassId.mod
     if (pt === 'resourcepack' || pt === 'resourcepacks') return CurseforgeBuiltinClassId.resourcePack

@@ -2,11 +2,14 @@
 import StoreProject, { StoreProject as IStoreProject } from '@/components/StoreProject.vue'
 import { StoreProjectVersion } from '@/components/StoreProjectInstallVersionDialog.vue'
 import { TeamMember } from '@/components/StoreProjectMembers.vue'
-import { getCurseforgeProjectDescriptionModel, getCurseforgeProjectFilesModel, getCurseforgeProjectModel, useCurseforgeCategoryI18n } from '@/composables/curseforge'
+import { getCurseforgeProjectDescriptionModel, getCurseforgeProjectFilesModel, getCurseforgeProjectModel, useCurseforgeCategoryI18n, CurseforgeBuiltinClassId } from '@/composables/curseforge'
 import { getCurseforgeChangelogModel } from '@/composables/curseforgeChangelog'
 import { useDateString } from '@/composables/date'
 import { kInstances } from '@/composables/instances'
 import { useModpackInstaller } from '@/composables/modpackInstaller'
+import { useInstanceModLoaderDefault } from '@/composables/instanceModLoaderDefault'
+import { useNotifier } from '@/composables/notifier'
+import { isNoModLoader } from '@/util/isNoModloader'
 import { useSWRVModel } from '@/composables/swrv'
 import { kSWRVConfig } from '@/composables/swrvConfig'
 import { useTasks } from '@/composables/task'
@@ -15,7 +18,7 @@ import { getCurseforgeFileGameVersions, getCursforgeFileModLoaders } from '@/uti
 import { injection } from '@/util/inject'
 import { getSWRV } from '@/util/swrvGet'
 import { FileRelationType } from '@xmcl/curseforge'
-import { TaskState, ProjectMapping, ProjectMappingServiceKey } from '@xmcl/runtime-api'
+import { TaskState, ProjectMapping, ProjectMappingServiceKey, InstanceInstallServiceKey, InstanceModsServiceKey, InstanceResourcePacksServiceKey, InstanceShaderPacksServiceKey, MarketType } from '@xmcl/runtime-api'
 import { useI18nSearchFlights } from '@/composables/flights'
 import { useAutoI18nCommunityContent } from '@/composables/i18n'
 import { useService } from '@/composables/service'
@@ -168,12 +171,53 @@ const members = computed(() => {
 })
 
 const _installing = ref(false)
-const onInstall = (v: StoreProjectVersion) => {
+const { notify } = useNotifier()
+const installDefaultModLoader = useInstanceModLoaderDefault()
+const { installInstanceFiles } = useService(InstanceInstallServiceKey)
+const modService = useService(InstanceModsServiceKey)
+const resourcePackService = useService(InstanceResourcePacksServiceKey)
+const shaderPackService = useService(InstanceShaderPacksServiceKey)
+
+const onInstall = async (v: StoreProjectVersion) => {
   if (!proj.value) return
   _installing.value = true
-  installModpack({ modId: proj.value!.id, fileId: Number(v.id), icon: project.value?.iconUrl, market: 1 }).finally(() => {
+  try {
+    if (proj.value.classId === CurseforgeBuiltinClassId.modpack) {
+      await installModpack({ modId: proj.value.id, fileId: Number(v.id), icon: project.value?.iconUrl, market: 1 })
+    } else {
+      const targetInstance = instances.value.find(i => i.path === selectedInstance.value) || instances.value[0]
+      if (!targetInstance) {
+        notify({ level: 'warning', title: t('instance.noInstance') || 'No Minecraft instance found. Please create one first.' })
+        return
+      }
+
+      const isShader = proj.value.classId === CurseforgeBuiltinClassId.shaderPack
+      const isResource = proj.value.classId === CurseforgeBuiltinClassId.resourcePack
+      const service = isShader ? shaderPackService : isResource ? resourcePackService : modService
+      const domain = isShader ? 'shaderpacks' : isResource ? 'resourcepacks' : 'mods'
+
+      if (domain === 'mods' && isNoModLoader(targetInstance.runtime)) {
+        await installDefaultModLoader(targetInstance.path, targetInstance.runtime, v.loaders)
+      }
+
+      const files = await service.resolveFromMarket({
+        market: MarketType.CurseForge,
+        file: [{ fileId: Number(v.id), icon: project.value?.iconUrl }],
+        instancePath: targetInstance.path,
+      })
+
+      await installInstanceFiles({
+        path: targetInstance.path,
+        files,
+        oldFiles: [],
+      })
+      notify({ level: 'success', title: `${project.value?.title || 'Project'} installed!` })
+    }
+  } catch (e: any) {
+    notify({ level: 'error', title: e?.message || 'Installation failed' })
+  } finally {
     _installing.value = false
-  })
+  }
 }
 
 const { instances, selectedInstance } = injection(kInstances)

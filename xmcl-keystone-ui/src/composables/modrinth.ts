@@ -72,7 +72,7 @@ export function getFacatsText(
   license: string,
   category: string[],
   modLoaders: string[],
-  projectType: string,
+  projectType: string | string[],
   environment: string,
 ) {
   const facets: string[][] = []
@@ -89,7 +89,15 @@ export function getFacatsText(
     facets.push(category.map(c => `categories:${c}`))
   }
   if (projectType) {
-    facets.push([`project_type:${projectType}`])
+    if (Array.isArray(projectType)) {
+      if (projectType.length === 1) {
+        facets.push([`project_type:${projectType[0]}`])
+      } else if (projectType.length > 1) {
+        facets.push(projectType.map(pt => `project_type:${pt}`))
+      }
+    } else {
+      facets.push([`project_type:${projectType}`])
+    }
   }
   if (environment) {
     if (environment === 'server') {
@@ -123,7 +131,7 @@ export function useModrinthSearchFunc(
   modLoader: MaybeRef<string[]>,
   environment: MaybeRef<string>,
   sortBy: MaybeRef<string | undefined>,
-  projectType: MaybeRef<string>,
+  projectType: MaybeRef<string | string[]>,
   pageSize: MaybeRef<number>,
 ) {
   async function search(index: number, signal?: AbortSignal) {
@@ -148,7 +156,7 @@ export function useModrinth(
   modLoader: MaybeRef<string[]>,
   environment: MaybeRef<string>,
   sortBy: MaybeRef<string | undefined>,
-  projectType: MaybeRef<string>,
+  projectType: MaybeRef<string | string[]>,
   page: MaybeRef<number>,
   pageSize: MaybeRef<number>,
 ) {

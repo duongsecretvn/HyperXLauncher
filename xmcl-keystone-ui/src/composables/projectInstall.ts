@@ -26,70 +26,64 @@ export function useProjectInstall(runtime: Ref<RuntimeVersions>,
   const config = injection(kSWRVConfig)
   const { notify } = useNotifier()
   const onInstallProject = async (item: ProjectEntry) => {
-    const modrinthProjectId = item.modrinth?.project_id
-    const curseforgeId = item.curseforge?.id
-    if (modrinthProjectId) {
-      const proj = await getSWRV(getModrinthProjectModel(ref(modrinthProjectId)), config)
-      if (!proj) {
-        notify({
-          level: 'error',
-          title: 'Failed to get modrinth project',
-        })
-        return
+    try {
+      const activeLoader = loader.value || (
+        runtime.value.forge ? 'forge'
+        : runtime.value.fabricLoader ? 'fabric'
+        : runtime.value.neoForged ? 'neoforge'
+        : runtime.value.quiltLoader ? 'quilt'
+        : undefined
+      )
+
+      const modrinthProjectId = item.modrinth?.project_id
+      const curseforgeId = item.curseforge?.id
+
+      if (modrinthProjectId) {
+        const proj = await getSWRV(getModrinthProjectModel(ref(modrinthProjectId)), config)
+        const gameVersions = [runtime.value.minecraft]
+        const versions = await getSWRV(getModrinthVersionModel(ref(modrinthProjectId), undefined, ref(activeLoader), ref(gameVersions)), config)
+        const version = (activeLoader && versions ? versions.find(v => v.loaders.includes(activeLoader)) : undefined) || versions?.[0]
+        if (version) {
+          const deps = await getSWRV(getModrinthDependenciesModel(ref(version), ref(activeLoader), config), config)
+          const artifactUrl = (version.files?.find(file => file.primary) ?? version.files?.[0])?.url
+          await modrinthInstaller.installWithDependencies(version.id, version.loaders, proj?.icon_url, item.installed, deps || [], artifactUrl)
+          return
+        }
       }
-      const gameVersions = [runtime.value.minecraft]
-      const versions = await getSWRV(getModrinthVersionModel(ref(modrinthProjectId), undefined, loader, ref(gameVersions)), config)
-      if (!versions) {
-        notify({
-          level: 'error',
-          title: 'Failed to get modrinth versions',
-        })
-        return
+
+      if (curseforgeId) {
+        const proj = await getSWRV(getCurseforgeProjectModel(ref(curseforgeId)), config)
+        const _loaders = getCursforgeModLoadersFromString(activeLoader)
+        let files = await getSWRV(getCurseforgeProjectFilesModel(ref(curseforgeId), ref(runtime.value.minecraft), ref(_loaders[0])), config)
+        if (!files || !files.data || files.data.length === 0) {
+          files = await getSWRV(getCurseforgeProjectFilesModel(ref(curseforgeId), ref(runtime.value.minecraft), ref(undefined)), config)
+        }
+        const file = files?.data?.[0]
+        if (file) {
+          const loaderType = getModLoaderTypesForFile(file)
+          const deps = await getSWRV(getCurseforgeDependenciesModel(ref(file), ref(runtime.value.minecraft), ref([...loaderType][0]), config), config)
+          await curseforgeInstaller.installWithDependencies(file.id, getCursforgeFileModLoaders(file), proj?.logo?.url, item.installed, deps || [], file.downloadUrl)
+          return
+        }
       }
-      const version = versions?.[0]
-      const deps = await getSWRV(getModrinthDependenciesModel(ref(version), loader, config), config)
-      const artifactUrl = (version.files.find(file => file.primary) ?? version.files[0])?.url
-      await modrinthInstaller.installWithDependencies(version.id, version.loaders, proj.icon_url, item.installed, deps || [], artifactUrl)
-    } else if (curseforgeId) {
-      const proj = await getSWRV(getCurseforgeProjectModel(ref(curseforgeId)), config)
-      if (!proj) {
-        notify({
-          level: 'error',
-          title: 'Failed to get curseforge project',
-        })
-        return
+
+      if (item.files && item.files.length > 0) {
+        const file = item.files[0]
+        if (file) {
+          installLocal(file)
+          return
+        }
       }
-      const _loaders = getCursforgeModLoadersFromString(loader.value)
-      const files = await getSWRV(getCurseforgeProjectFilesModel(ref(curseforgeId), ref(runtime.value.minecraft), ref(_loaders[0])), config)
-      if (!files) {
-        notify({
-          level: 'error',
-          title: 'Failed to get curseforge files',
-        })
-        return
-      }
-      const file = files.data[0]
-      if (!file) {
-        notify({
-          level: 'error',
-          title: 'Failed to get curseforge files',
-        })
-        // TODO: log this case
-        return
-      }
-      const loaderType = getModLoaderTypesForFile(file)
-      const deps = await getSWRV(getCurseforgeDependenciesModel(ref(file), ref(runtime.value.minecraft), ref([...loaderType][0]), config), config)
-      await curseforgeInstaller.installWithDependencies(file.id, getCursforgeFileModLoaders(file), proj.logo.url, item.installed, deps || [], file.downloadUrl)
-    } else if (item.files) {
-      const file = item.files[0]
-      if (!file) {
-        notify({
-          level: 'error',
-          title: 'Failed to get project file',
-        })
-        return
-      }
-      installLocal(file)
+
+      notify({
+        level: 'warning',
+        title: `No compatible version found for Minecraft ${runtime.value.minecraft}${activeLoader ? ` (${activeLoader})` : ''}`,
+      })
+    } catch (e: any) {
+      notify({
+        level: 'error',
+        title: e?.message || 'Failed to install project',
+      })
     }
   }
 
