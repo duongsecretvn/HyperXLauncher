@@ -22,7 +22,7 @@ export interface CurseforgeProps {
 }
 
 export function useCurseforge(
-  classId: MaybeRef<number>,
+  classId: MaybeRef<number | undefined>,
   keyword: Ref<string>,
   page: Ref<number>,
   modLoaders: Ref<FileModLoaderType[]>,
@@ -88,7 +88,7 @@ export enum CurseforgeBuiltinClassId {
 }
 
 export function useCurseforgeSearchFunc(
-  classId: MaybeRef<number>,
+  classId: MaybeRef<number | undefined>,
   keyword: Ref<string>,
   loaders: Ref<FileModLoaderType[]>,
   curseforgeCategory: Ref<number | undefined>,

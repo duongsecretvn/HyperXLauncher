@@ -77,6 +77,16 @@
         </div>
       </div>
 
+      <!-- Mods & Packs -->
+      <FilterCard
+        title="Mods & Packs"
+        :items="modsAndPacksList"
+        :selected="selectedProjectType ? [selectedProjectType] : []"
+        :selected-count="selectedProjectType ? 1 : 0"
+        @toggle="toggleProjectType"
+        @clear="selectedProjectType = ''"
+      />
+
       <!-- ModLoaders -->
       <FilterCard
         :title="t('modrinth.modLoaders.name')"
@@ -343,6 +353,7 @@ function ensureQuery(query: Record<string, string | (string | null)[] | null | u
 
 const query = useQuery('query', ensureQuery)
 const gameVersion = useQuery('gameVersion', ensureQuery)
+const selectedProjectType = useQuery('projectType', ensureQuery)
 const modLoaders = useQueryStringArray('modLoaders', ensureQuery)
 const sortQuery = useQuery('sort', ensureQuery)
 const sort = computed({
@@ -360,6 +371,42 @@ const curseforgeCategory = useQueryNumber(
 )
 const pageSize = 20
 
+const modsAndPacksList = [
+  {
+    id: 'modpack',
+    text: 'Modpacks',
+    iconHTML: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2l-9 4.5v11l9 4.5 9-4.5v-11l-9-4.5zm0 2.2l6.8 3.4-3.3 1.7-6.8-3.4 3.3-1.7zm-7 5.1l6 3v7.3l-6-3v-7.3zm8 10.3v-7.3l6-3v7.3l-6 3z"/></svg>',
+  },
+  {
+    id: 'mod',
+    text: 'Mods',
+    iconHTML: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7 1.49 0 2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5s-1.12-2.5-2.5-2.5z"/></svg>',
+  },
+  {
+    id: 'resourcepack',
+    text: 'Resource Packs',
+    iconHTML: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.27 19.57 10.59 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-5 9c-.83 0-1.5-.67-1.5-1.5S6.17 9 7 9s1.5.67 1.5 1.5S7.83 12 7 12zm3-4c-.83 0-1.5-.67-1.5-1.5S9.17 5 10 5s1.5.67 1.5 1.5S10.83 8 10 8zm4 0c-.83 0-1.5-.67-1.5-1.5S13.17 5 14 5s1.5.67 1.5 1.5S14.83 8 14 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.17 9 17 9s1.5.67 1.5 1.5S17.83 12 17 12z"/></svg>',
+  },
+  {
+    id: 'datapack',
+    text: 'Data Packs',
+    iconHTML: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>',
+  },
+  {
+    id: 'shader',
+    text: 'Shaders',
+    iconHTML: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8v16z"/></svg>',
+  },
+]
+
+function toggleProjectType(id: string) {
+  if (selectedProjectType.value === id) {
+    selectedProjectType.value = ''
+  } else {
+    selectedProjectType.value = id
+  }
+}
+
 // --- Data Fetching Logic ---
 const tCategory = useCurseforgeCategoryI18n()
 const { getDateString } = useDateString()
@@ -374,6 +421,7 @@ const { items, isSearching, searchError, pageCount, sources } = useSearchedItems
   omitSources,
   modrinthCategories: _modrinthCategories,
   curseforgeCategory,
+  projectType: selectedProjectType,
   pageSize,
   tCategory,
 })
@@ -432,9 +480,19 @@ const {
   gameVersions,
 } = injection(kModrinthTags)
 const { categories: curseforgeCategories } = injection(kCurseforgeCategories)
-const catModLoaders = computed(() =>
-  modrinthModloaders.value.filter((v) => v.supported_project_types.includes('modpack')),
-)
+const catModLoaders = computed(() => {
+  const pt = selectedProjectType.value
+  if (pt === 'modpack') {
+    return modrinthModloaders.value.filter((v) => v.supported_project_types.includes('modpack'))
+  }
+  if (pt === 'mod') {
+    return modrinthModloaders.value.filter((v) => v.supported_project_types.includes('mod'))
+  }
+  if (pt === 'shader') {
+    return modrinthModloaders.value.filter((v) => v.supported_project_types.includes('shader'))
+  }
+  return modrinthModloaders.value.filter((v) => v.supported_project_types.includes('modpack') || v.supported_project_types.includes('mod'))
+})
 
 const enter = (type: string, id: string) => {
   push(`/store/${type}/${id}`)

@@ -23,6 +23,7 @@ interface UseSearchedItemsOptions {
   omitSources: Ref<string[]>
   modrinthCategories: Ref<string[]>
   curseforgeCategory: Ref<number | undefined>
+  projectType?: Ref<string>
   pageSize: number
   tCategory: (key: string) => string
 }
@@ -37,6 +38,7 @@ export function useSearchedItems(options: UseSearchedItemsOptions) {
     omitSources,
     modrinthCategories,
     curseforgeCategory,
+    projectType,
     pageSize,
     tCategory,
   } = options
@@ -53,10 +55,13 @@ export function useSearchedItems(options: UseSearchedItemsOptions) {
   // FTB
   type StoreProject = ExploreProjectModern & { sortMetrics: StoreSortMetrics }
   const ftbItems = shallowRef<StoreProject[]>([])
-  watch([ftbData, page], async ([packs, pageNum], _, onCleanup) => {
+  watch([ftbData, page, projectType || ref('')], async ([packs, pageNum, pt], _, onCleanup) => {
     let cancelled = false
     onCleanup(() => { cancelled = true })
     ftbItems.value = []
+    if (pt && pt !== 'modpack' && pt !== 'modpacks') {
+      return
+    }
     if (!packs) {
       ftbItems.value = []
       return
@@ -94,6 +99,28 @@ export function useSearchedItems(options: UseSearchedItemsOptions) {
     if (!cancelled) ftbItems.value = result
   }, { immediate: true })
 
+  const modrinthProjectType = computed(() => {
+    const pt = projectType?.value
+    if (!pt) return ''
+    if (pt === 'modpack' || pt === 'modpacks') return 'modpack'
+    if (pt === 'mod' || pt === 'mods') return 'mod'
+    if (pt === 'resourcepack' || pt === 'resourcepacks') return 'resourcepack'
+    if (pt === 'datapack' || pt === 'datapacks') return 'datapack'
+    if (pt === 'shader' || pt === 'shaders') return 'shader'
+    return pt
+  })
+
+  const curseforgeClassId = computed(() => {
+    const pt = projectType?.value
+    if (!pt) return undefined
+    if (pt === 'modpack' || pt === 'modpacks') return CurseforgeBuiltinClassId.modpack
+    if (pt === 'mod' || pt === 'mods') return CurseforgeBuiltinClassId.mod
+    if (pt === 'resourcepack' || pt === 'resourcepacks') return CurseforgeBuiltinClassId.resourcePack
+    if (pt === 'datapack' || pt === 'datapacks') return CurseforgeBuiltinClassId.datapack
+    if (pt === 'shader' || pt === 'shaders') return CurseforgeBuiltinClassId.shaderPack
+    return undefined
+  })
+
   // Modrinth
   const {
     error: searchError,
@@ -108,14 +135,14 @@ export function useSearchedItems(options: UseSearchedItemsOptions) {
     modLoaders,
     '',
     modrinthSort,
-    'modpack',
+    modrinthProjectType,
     page,
     pageSize,
   )
 
   // Curseforge
   const { projects: curseforgeProjects, pages: curseforgePageCount, isValidating: isCurseforgeSearching } = useCurseforge(
-    CurseforgeBuiltinClassId.modpack,
+    curseforgeClassId,
     query,
     page,
     computed(() => getCursforgeModLoadersFromString(modLoaders.value)),

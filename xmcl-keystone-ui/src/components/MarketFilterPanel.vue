@@ -209,12 +209,29 @@
               multiple
             >
               <ModrinthCategoryChip
-                v-for="tag in _modrinthCategories"
+                v-for="(tag, index) in _modrinthCategories"
+                v-show="modrinthExpanded || index < modrinthCollapsedCount || props.modrinthCategories.includes(tag.name)"
                 :key="tag.name"
                 :tag="tag"
                 :disabled="!enableModrinth"
               />
             </v-chip-group>
+            <button
+              v-if="!modrinthExpanded && _modrinthCategories.length > modrinthCollapsedCount"
+              type="button"
+              class="filter-card__more block w-full text-center mt-1 py-1 text-xs opacity-60 cursor-pointer hover:opacity-100 transition-opacity"
+              @click="modrinthExpanded = true"
+            >
+              +{{ _modrinthCategories.length - modrinthCollapsedCount }} more
+            </button>
+            <button
+              v-else-if="modrinthExpanded && _modrinthCategories.length > modrinthCollapsedCount"
+              type="button"
+              class="filter-card__more block w-full text-center mt-1 py-1 text-xs opacity-60 cursor-pointer hover:opacity-100 transition-opacity flex items-center justify-center gap-1"
+              @click="modrinthExpanded = false"
+            >
+              <v-icon size="16">expand_less</v-icon>
+            </button>
           </div>
           <div v-if="curseforgeCategoryFilter" class="filter-category-column">
             <div class="filter-subheader flex">
@@ -240,12 +257,29 @@
               :disabled="!enableCurseforge"
             >
               <CurseforgeCategoryChip
-                v-for="c of curseforgeCategories"
+                v-for="(c, index) of curseforgeCategories"
+                v-show="curseforgeExpanded || index < curseforgeCollapsedCount || props.curseforgeCategory === c.id"
                 :key="c.id"
                 :disabled="!enableCurseforge"
                 :value="c"
               />
             </v-chip-group>
+            <button
+              v-if="!curseforgeExpanded && curseforgeCategories.length > curseforgeCollapsedCount"
+              type="button"
+              class="filter-card__more block w-full text-center mt-1 py-1 text-xs opacity-60 cursor-pointer hover:opacity-100 transition-opacity"
+              @click="curseforgeExpanded = true"
+            >
+              +{{ curseforgeCategories.length - curseforgeCollapsedCount }} more
+            </button>
+            <button
+              v-else-if="curseforgeExpanded && curseforgeCategories.length > curseforgeCollapsedCount"
+              type="button"
+              class="filter-card__more block w-full text-center mt-1 py-1 text-xs opacity-60 cursor-pointer hover:opacity-100 transition-opacity flex items-center justify-center gap-1"
+              @click="curseforgeExpanded = false"
+            >
+              <v-icon size="16">expand_less</v-icon>
+            </button>
             <template v-if="curseforgeSecondaryCategoryFilter">
               <div v-if="curseforgeSecondaryCategoryLabel" class="filter-subheader filter-subheader--minor flex">
                 {{ curseforgeSecondaryCategoryLabel }}
@@ -258,12 +292,29 @@
                 :disabled="!enableCurseforge"
               >
                 <CurseforgeCategoryChip
-                  v-for="c of curseforgeSecondaryCategories"
+                  v-for="(c, index) of curseforgeSecondaryCategories"
+                  v-show="curseforgeSecondaryExpanded || index < curseforgeCollapsedCount || props.curseforgeSecondaryCategory === c.id"
                   :key="c.id"
                   :disabled="!enableCurseforge"
                   :value="c"
                 />
               </v-chip-group>
+              <button
+                v-if="!curseforgeSecondaryExpanded && curseforgeSecondaryCategories.length > curseforgeCollapsedCount"
+                type="button"
+                class="filter-card__more block w-full text-center mt-1 py-1 text-xs opacity-60 cursor-pointer hover:opacity-100 transition-opacity"
+                @click="curseforgeSecondaryExpanded = true"
+              >
+                +{{ curseforgeSecondaryCategories.length - curseforgeCollapsedCount }} more
+              </button>
+              <button
+                v-else-if="curseforgeSecondaryExpanded && curseforgeSecondaryCategories.length > curseforgeCollapsedCount"
+                type="button"
+                class="filter-card__more block w-full text-center mt-1 py-1 text-xs opacity-60 cursor-pointer hover:opacity-100 transition-opacity flex items-center justify-center gap-1"
+                @click="curseforgeSecondaryExpanded = false"
+              >
+                <v-icon size="16">expand_less</v-icon>
+              </button>
             </template>
           </div>
         </div>
@@ -450,6 +501,12 @@ const _modrinthCategories = computed(() => {
   return result.filter((r) => r.project_type === filter)
 })
 const { t } = useI18n()
+
+const modrinthExpanded = ref(false)
+const modrinthCollapsedCount = 8
+const curseforgeExpanded = ref(false)
+const curseforgeCollapsedCount = 8
+const curseforgeSecondaryExpanded = ref(false)
 
 const { runtime } = injection(kInstance)
 const versionIds = computed(() =>
@@ -638,5 +695,13 @@ function getIcon(loader: string) {
   grid-template-columns: 1fr 1fr;
   gap: 8px;
   align-items: start;
+}
+.filter-card__more {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  font: inherit;
+  padding: 4px;
+  appearance: none;
 }
 </style>
