@@ -1,0 +1,2246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HyperXLauncher — Next-Gen Minecraft Launcher (v1.0.1)</title>
+  <meta name="description" content="HyperXLauncher v1.0.1 - The next-generation Minecraft launcher built for pure speed, seamless multi-instance orchestration, and deep mod ecosystem integration (Fabric, Forge, NeoForge, Quilt, CurseForge, Modrinth).">
+  <meta name="theme-color" content="#090B10">
+
+  <style>
+    /* ==========================================================================
+       Astryx Design System — Core CSS Tokens & Foundations
+       Neutral-Dark Palette with Acrylic Glassmorphism & High-Energy Cyber Accents
+       ========================================================================== */
+    :root {
+      /* Astryx Neutral-Dark Canvas */
+      --bg-void: #06080C;
+      --bg-canvas: #0A0E17;
+      --bg-surface-glass: rgba(16, 22, 34, 0.72);
+      --bg-surface-card: rgba(19, 27, 43, 0.65);
+      --bg-surface-hover: rgba(26, 38, 62, 0.85);
+      --bg-elevated: rgba(28, 41, 68, 0.92);
+      --bg-input: rgba(12, 16, 26, 0.75);
+
+      /* Astryx Border & Stroke */
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --border-glass: rgba(255, 255, 255, 0.12);
+      --border-accent: rgba(1, 113, 227, 0.5);
+      --border-glow-cyan: rgba(0, 240, 255, 0.45);
+      --border-glow-emerald: rgba(52, 211, 153, 0.4);
+
+      /* Astryx Typography Tokens */
+      --color-text-primary: #F8FAFC;
+      --color-text-secondary: #94A3B8;
+      --color-text-muted: #64748B;
+      --color-text-accent: #38BDF8;
+      --color-text-emerald: #34D399;
+
+      /* Brand Accents */
+      --color-accent-primary: #0171E3;
+      --color-accent-primary-hover: #0060C2;
+      --color-accent-cyan: #00F0FF;
+      --color-accent-emerald: #10B981;
+      --color-accent-purple: #8B5CF6;
+      --color-accent-orange: #F97316;
+      --color-accent-red: #EF4444;
+
+      /* Acrylic Glass & Shadows */
+      --blur-acrylic: blur(24px) saturate(190%);
+      --blur-glass: blur(16px);
+      --shadow-card: 0 16px 36px -12px rgba(0, 0, 0, 0.75), 0 0 0 1px var(--border-subtle);
+      --shadow-card-hover: 0 24px 48px -12px rgba(0, 240, 255, 0.12), 0 0 0 1px var(--border-accent);
+      --shadow-glow-cyan: 0 0 35px rgba(0, 240, 255, 0.3);
+      --shadow-glow-blue: 0 12px 32px -4px rgba(1, 113, 227, 0.5);
+      --shadow-pill: 0 8px 24px -4px rgba(1, 113, 227, 0.4);
+
+      /* Spacing Scale (Astryx 4px Grid) */
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --space-10: 40px;
+      --space-12: 48px;
+      --space-16: 64px;
+      --space-20: 80px;
+      --space-24: 96px;
+
+      /* Border Radii */
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 24px;
+      --radius-pill: 9999px;
+
+      /* Font Family */
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+      --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+      /* Transitions */
+      --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+      --duration-fast: 150ms;
+      --duration-normal: 250ms;
+      --duration-slow: 400ms;
+    }
+
+    /* Reset & Base */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      color-scheme: dark;
+    }
+
+    body {
+      background-color: var(--bg-void);
+      color: var(--color-text-primary);
+      font-family: var(--font-sans);
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* Accessibility Focus Outline */
+    :focus-visible {
+      outline: 2px solid var(--color-accent-cyan);
+      outline-offset: 3px;
+    }
+
+    /* Container */
+    .container {
+      width: 100%;
+      max-width: 1240px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: var(--space-6);
+      padding-right: var(--space-6);
+    }
+
+    /* ==========================================================================
+       Ambient Glow Background Canvas
+       ========================================================================== */
+    .ambient-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .ambient-blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(120px);
+      opacity: 0.28;
+      transition: all 1s ease;
+      animation: floatSlow 18s ease-in-out infinite alternate;
+    }
+
+    .blob-1 {
+      top: -10%;
+      left: 15%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, #0171E3 0%, rgba(1, 113, 227, 0) 70%);
+    }
+
+    .blob-2 {
+      top: 25%;
+      right: -10%;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, #00F0FF 0%, rgba(0, 240, 255, 0) 70%);
+      opacity: 0.16;
+      animation-duration: 24s;
+    }
+
+    .blob-3 {
+      bottom: -15%;
+      left: 20%;
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(circle, #7952FF 0%, rgba(121, 82, 255, 0) 70%);
+      opacity: 0.18;
+      animation-duration: 20s;
+    }
+
+    .grid-overlay {
+      position: absolute;
+      inset: 0;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 30%, rgba(0, 0, 0, 0) 80%);
+      -webkit-mask-image: radial-gradient(ellipse at center, rgba(0, 0, 0, 1) 30%, rgba(0, 0, 0, 0) 80%);
+    }
+
+    @keyframes floatSlow {
+      0% { transform: translateY(0px) rotate(0deg) scale(1); }
+      50% { transform: translateY(40px) rotate(10deg) scale(1.08); }
+      100% { transform: translateY(-30px) rotate(-8deg) scale(0.95); }
+    }
+
+    /* ==========================================================================
+       Header / Top Navigation
+       ========================================================================== */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 74px;
+      background: rgba(10, 14, 23, 0.82);
+      backdrop-filter: var(--blur-glass);
+      -webkit-backdrop-filter: var(--blur-glass);
+      border-bottom: 1px solid var(--border-subtle);
+      z-index: 1000;
+      transition: background var(--duration-normal) ease, border-color var(--duration-normal) ease;
+    }
+
+    .nav-inner {
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Logo */
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-3);
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .brand-cube-icon {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(1, 113, 227, 0.25), rgba(0, 240, 255, 0.15));
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-md);
+      box-shadow: 0 4px 12px rgba(1, 113, 227, 0.25);
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: var(--space-1);
+    }
+
+    .brand-gradient {
+      background: linear-gradient(120deg, #00F0FF, #38BDF8, #0171E3);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .version-tag {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      background: rgba(1, 113, 227, 0.18);
+      border: 1px solid rgba(1, 113, 227, 0.4);
+      color: var(--color-text-accent);
+      letter-spacing: 0.04em;
+      margin-left: var(--space-1);
+    }
+
+    /* Nav Links */
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: var(--space-8);
+      list-style: none;
+    }
+
+    .nav-link {
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      font-size: 0.94rem;
+      font-weight: 500;
+      position: relative;
+      transition: color var(--duration-fast) ease;
+      padding: var(--space-1) 0;
+    }
+
+    .nav-link:hover {
+      color: var(--color-text-primary);
+    }
+
+    .nav-link::after {
+      content: "";
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 0%;
+      height: 2px;
+      background: var(--color-accent-cyan);
+      box-shadow: 0 0 8px var(--color-accent-cyan);
+      border-radius: var(--radius-pill);
+      transition: width var(--duration-normal) var(--ease-spring);
+    }
+
+    .nav-link:hover::after {
+      width: 100%;
+    }
+
+    /* Nav Actions */
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .btn-gh {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 8px 14px;
+      border-radius: var(--radius-pill);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-glass);
+      color: var(--color-text-primary);
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: all var(--duration-fast) ease;
+    }
+
+    .btn-gh:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .btn-nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 8px 18px;
+      border-radius: var(--radius-pill);
+      background: linear-gradient(135deg, #0171E3, #0284C7);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #FFFFFF;
+      text-decoration: none;
+      font-size: 0.88rem;
+      font-weight: 600;
+      box-shadow: 0 4px 16px rgba(1, 113, 227, 0.35);
+      transition: all var(--duration-fast) ease;
+    }
+
+    .btn-nav-cta:hover {
+      background: linear-gradient(135deg, #0284C7, #00F0FF);
+      color: #06080C;
+      box-shadow: 0 6px 20px rgba(0, 240, 255, 0.45);
+      transform: translateY(-1px);
+    }
+
+    /* Mobile Hamburger */
+    .btn-hamburger {
+      display: none;
+      background: transparent;
+      border: none;
+      color: var(--color-text-primary);
+      cursor: pointer;
+      padding: var(--space-2);
+    }
+
+    /* ==========================================================================
+       Hero Stage & Acrylic Preview
+       ========================================================================== */
+    .hero-section {
+      position: relative;
+      padding-top: calc(74px + var(--space-16));
+      padding-bottom: var(--space-20);
+      z-index: 1;
+      text-align: center;
+    }
+
+    .release-badge-wrapper {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      padding: 6px 16px;
+      border-radius: var(--radius-pill);
+      background: rgba(1, 113, 227, 0.12);
+      border: 1px solid rgba(1, 113, 227, 0.35);
+      backdrop-filter: blur(8px);
+      margin-bottom: var(--space-6);
+    }
+
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--color-accent-emerald);
+      box-shadow: 0 0 10px var(--color-accent-emerald);
+      animation: pulseAnim 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseAnim {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    .release-badge-text {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--color-text-accent);
+      letter-spacing: 0.02em;
+    }
+
+    .hero-heading {
+      font-size: clamp(2.4rem, 5.5vw, 4.4rem);
+      font-weight: 800;
+      line-height: 1.08;
+      letter-spacing: -0.035em;
+      margin-bottom: var(--space-6);
+      max-width: 950px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-heading span.gradient-word {
+      background: linear-gradient(135deg, #FFFFFF 20%, #A5F3FC 60%, #00F0FF 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subheading {
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      color: var(--color-text-secondary);
+      max-width: 740px;
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: var(--space-10);
+      line-height: 1.65;
+    }
+
+    /* Download Hub */
+    .download-hub {
+      max-width: 680px;
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: var(--space-12);
+    }
+
+    /* Primary OS Download Card */
+    .download-card-primary {
+      position: relative;
+      background: linear-gradient(140deg, rgba(1, 113, 227, 0.95), rgba(3, 105, 161, 0.9));
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6) var(--space-8);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-6);
+      text-decoration: none;
+      color: #FFFFFF;
+      box-shadow: var(--shadow-glow-blue), 0 20px 40px rgba(0, 0, 0, 0.4);
+      transition: all var(--duration-normal) var(--ease-spring);
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .download-card-primary::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.15), transparent 60%);
+      opacity: 0;
+      transition: opacity var(--duration-normal) ease;
+    }
+
+    .download-card-primary:hover {
+      transform: translateY(-3px) scale(1.015);
+      box-shadow: 0 16px 40px rgba(0, 240, 255, 0.45), 0 0 20px rgba(1, 113, 227, 0.6);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+
+    .download-card-primary:hover::before {
+      opacity: 1;
+    }
+
+    .dl-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-5);
+      text-align: left;
+    }
+
+    .dl-os-icon-box {
+      width: 54px;
+      height: 54px;
+      border-radius: var(--radius-lg);
+      background: rgba(255, 255, 255, 0.16);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4);
+    }
+
+    .dl-title-block h3 {
+      font-size: 1.35rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .dl-title-block p {
+      font-size: 0.86rem;
+      color: rgba(255, 255, 255, 0.85);
+      font-family: var(--font-mono);
+    }
+
+    .dl-arrow-action {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: transform var(--duration-normal) var(--ease-spring), background var(--duration-fast) ease;
+    }
+
+    .download-card-primary:hover .dl-arrow-action {
+      transform: translateY(3px) scale(1.1);
+      background: #FFFFFF;
+      color: #0171E3;
+    }
+
+    .download-card-primary:hover .dl-arrow-action svg {
+      stroke: #0171E3;
+    }
+
+    /* OS Switcher Pills */
+    .os-switcher {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      margin-top: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    .os-tab-btn {
+      background: rgba(19, 27, 43, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-pill);
+      padding: 6px 14px;
+      font-size: 0.84rem;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      transition: all var(--duration-fast) ease;
+    }
+
+    .os-tab-btn:hover {
+      background: rgba(26, 38, 62, 0.8);
+      color: var(--color-text-primary);
+      border-color: var(--border-glass);
+    }
+
+    .os-tab-btn.active {
+      background: rgba(1, 113, 227, 0.22);
+      border-color: var(--color-accent-cyan);
+      color: var(--color-text-primary);
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.2);
+    }
+
+    /* Live Preview Frame */
+    .preview-stage {
+      max-width: 1040px;
+      margin-left: auto;
+      margin-right: auto;
+      position: relative;
+    }
+
+    .preview-glow-backdrop {
+      position: absolute;
+      inset: 20px;
+      background: linear-gradient(180deg, rgba(0, 240, 255, 0.18), rgba(1, 113, 227, 0.05));
+      filter: blur(50px);
+      z-index: 0;
+      border-radius: var(--radius-xl);
+    }
+
+    .window-frame {
+      position: relative;
+      z-index: 1;
+      background: rgba(14, 18, 28, 0.88);
+      backdrop-filter: var(--blur-acrylic);
+      -webkit-backdrop-filter: var(--blur-acrylic);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      text-align: left;
+    }
+
+    /* Window Titlebar */
+    .window-titlebar {
+      height: 44px;
+      background: rgba(9, 12, 19, 0.95);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0 var(--space-4);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .window-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .window-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .dot-close { background-color: #FF5F56; }
+    .dot-min { background-color: #FFBD2E; }
+    .dot-max { background-color: #27C93F; }
+
+    .window-title-text {
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--color-text-muted);
+      letter-spacing: 0.02em;
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .window-status-pill {
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid rgba(16, 185, 129, 0.35);
+      color: var(--color-accent-emerald);
+      border-radius: var(--radius-pill);
+    }
+
+    /* Window App Body */
+    .app-body {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      min-height: 440px;
+    }
+
+    /* App Sidebar */
+    .app-sidebar {
+      background: rgba(11, 15, 24, 0.7);
+      border-right: 1px solid var(--border-subtle);
+      padding: var(--space-4);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: 8px 12px;
+      border-radius: var(--radius-md);
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      transition: all var(--duration-fast) ease;
+    }
+
+    .sidebar-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--color-text-primary);
+    }
+
+    .sidebar-item.active {
+      background: rgba(1, 113, 227, 0.2);
+      color: var(--color-accent-cyan);
+      border-left: 3px solid var(--color-accent-cyan);
+    }
+
+    .sidebar-telemetry {
+      margin-top: auto;
+      padding: var(--space-3);
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-subtle);
+      font-size: 0.75rem;
+    }
+
+    .telemetry-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 4px;
+      color: var(--color-text-muted);
+    }
+
+    .telemetry-val {
+      font-family: var(--font-mono);
+      color: var(--color-text-secondary);
+    }
+
+    /* App Main Canvas */
+    .app-main {
+      padding: var(--space-6);
+      background: radial-gradient(circle at top right, rgba(1, 113, 227, 0.08), transparent 70%);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-5);
+    }
+
+    .instance-header-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .instance-headline h4 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+
+    .instance-headline span {
+      font-size: 0.82rem;
+      color: var(--color-text-muted);
+    }
+
+    .btn-create-inst {
+      background: linear-gradient(135deg, #0171E3, #0284C7);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #FFF;
+      font-size: 0.8rem;
+      font-weight: 600;
+      padding: 6px 14px;
+      border-radius: var(--radius-pill);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    /* Instance Grid Cards inside preview */
+    .preview-instances-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: var(--space-4);
+    }
+
+    .inst-card {
+      background: rgba(18, 25, 41, 0.8);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      position: relative;
+      transition: all var(--duration-fast) ease;
+    }
+
+    .inst-card:hover {
+      border-color: var(--color-accent-cyan);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+    }
+
+    .inst-badge-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .inst-icon-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.75rem;
+    }
+
+    .badge-fabric { background: rgba(0, 240, 255, 0.2); color: #00F0FF; border: 1px solid rgba(0, 240, 255, 0.3); }
+    .badge-neoforge { background: rgba(249, 115, 22, 0.2); color: #F97316; border: 1px solid rgba(249, 115, 22, 0.3); }
+    .badge-forge { background: rgba(239, 68, 68, 0.2); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    .inst-play-btn {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--color-accent-emerald);
+      color: #06080C;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform var(--duration-fast) ease;
+    }
+
+    .inst-play-btn:hover {
+      transform: scale(1.15);
+    }
+
+    .inst-info h5 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .inst-info p {
+      font-size: 0.76rem;
+      color: var(--color-text-secondary);
+    }
+
+    .inst-meta-tag {
+      font-size: 0.7rem;
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ==========================================================================
+       Features Section (Interactive Tab Switcher)
+       ========================================================================== */
+    .section-block {
+      padding-top: var(--space-20);
+      padding-bottom: var(--space-20);
+      position: relative;
+      z-index: 1;
+    }
+
+    .section-header {
+      text-align: center;
+      max-width: 760px;
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: var(--space-12);
+    }
+
+    .section-eyebrow {
+      display: inline-block;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--color-accent-cyan);
+      margin-bottom: var(--space-2);
+    }
+
+    .section-title {
+      font-size: clamp(2rem, 3.6vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: var(--space-4);
+    }
+
+    .section-desc {
+      font-size: 1.08rem;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Feature Tabs */
+    .feature-tabs-nav {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-3);
+      margin-bottom: var(--space-10);
+      flex-wrap: wrap;
+    }
+
+    .feature-tab-trigger {
+      background: rgba(16, 23, 37, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-pill);
+      padding: 10px 22px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--color-text-secondary);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      transition: all var(--duration-fast) ease;
+    }
+
+    .feature-tab-trigger:hover {
+      background: rgba(26, 38, 62, 0.85);
+      color: var(--color-text-primary);
+      border-color: var(--border-glass);
+    }
+
+    .feature-tab-trigger.active {
+      background: rgba(1, 113, 227, 0.2);
+      border-color: var(--color-accent-cyan);
+      color: #FFFFFF;
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.25);
+    }
+
+    .features-panel-container {
+      position: relative;
+      min-height: 380px;
+    }
+
+    .feature-panel {
+      display: none;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: var(--space-6);
+      animation: fadeIn 300ms ease;
+    }
+
+    .feature-panel.active {
+      display: grid;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Glass Feature Card */
+    .feature-glass-card {
+      background: var(--bg-surface-glass);
+      backdrop-filter: var(--blur-acrylic);
+      -webkit-backdrop-filter: var(--blur-acrylic);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-xl);
+      padding: var(--space-8);
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-card);
+      transition: all var(--duration-normal) var(--ease-spring);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .feature-glass-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-accent);
+      box-shadow: var(--shadow-card-hover);
+    }
+
+    .card-icon-halo {
+      width: 52px;
+      height: 52px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, rgba(1, 113, 227, 0.2), rgba(0, 240, 255, 0.15));
+      border: 1px solid var(--border-glass);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-5);
+      color: var(--color-accent-cyan);
+    }
+
+    .feature-glass-card h4 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      margin-bottom: var(--space-3);
+      color: var(--color-text-primary);
+    }
+
+    .feature-glass-card p {
+      font-size: 0.94rem;
+      color: var(--color-text-secondary);
+      line-height: 1.6;
+      margin-bottom: var(--space-5);
+      flex-grow: 1;
+    }
+
+    .card-feature-pill {
+      align-self: flex-start;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+      color: var(--color-text-accent);
+      font-family: var(--font-mono);
+    }
+
+    /* ==========================================================================
+       Modloader & Marketplace Ecosystem Grid
+       ========================================================================== */
+    .ecosystem-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--space-5);
+    }
+
+    .eco-card {
+      background: var(--bg-surface-glass);
+      backdrop-filter: var(--blur-acrylic);
+      -webkit-backdrop-filter: var(--blur-acrylic);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+      transition: all var(--duration-normal) var(--ease-spring);
+      position: relative;
+    }
+
+    .eco-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .eco-card.eco-fabric:hover { border-color: #00F0FF; box-shadow: 0 10px 30px rgba(0, 240, 255, 0.25); }
+    .eco-card.eco-neoforge:hover { border-color: #F97316; box-shadow: 0 10px 30px rgba(249, 115, 22, 0.25); }
+    .eco-card.eco-forge:hover { border-color: #EF4444; box-shadow: 0 10px 30px rgba(239, 68, 68, 0.25); }
+    .eco-card.eco-quilt:hover { border-color: #A855F7; box-shadow: 0 10px 30px rgba(168, 85, 247, 0.25); }
+    .eco-card.eco-curseforge:hover { border-color: #F87171; box-shadow: 0 10px 30px rgba(248, 113, 113, 0.25); }
+    .eco-card.eco-modrinth:hover { border-color: #10B981; box-shadow: 0 10px 30px rgba(16, 185, 129, 0.25); }
+    .eco-card.eco-ftb:hover { border-color: #EAB308; box-shadow: 0 10px 30px rgba(234, 179, 8, 0.25); }
+
+    .eco-card-top {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .eco-icon-wrapper {
+      width: 44px;
+      height: 44px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border-subtle);
+    }
+
+    .eco-card h4 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--color-text-primary);
+    }
+
+    .eco-card p {
+      font-size: 0.88rem;
+      color: var(--color-text-secondary);
+      line-height: 1.5;
+    }
+
+    .eco-tag {
+      font-size: 0.74rem;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      margin-top: auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* ==========================================================================
+       System Specs Table
+       ========================================================================== */
+    .specs-table-wrapper {
+      background: var(--bg-surface-glass);
+      backdrop-filter: var(--blur-acrylic);
+      -webkit-backdrop-filter: var(--blur-acrylic);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-xl);
+      overflow-x: auto;
+      box-shadow: var(--shadow-card);
+    }
+
+    .specs-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.94rem;
+    }
+
+    .specs-table th, .specs-table td {
+      padding: var(--space-5) var(--space-6);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .specs-table th {
+      background: rgba(255, 255, 255, 0.03);
+      font-size: 0.84rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--color-text-accent);
+    }
+
+    .specs-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .specs-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .spec-cat {
+      font-weight: 600;
+      color: var(--color-text-primary);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+
+    .spec-highlight {
+      color: var(--color-accent-emerald);
+      font-weight: 600;
+    }
+
+    /* ==========================================================================
+       FAQ Accordion
+       ========================================================================== */
+    .faq-container {
+      max-width: 820px;
+      margin-left: auto;
+      margin-right: auto;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-3);
+    }
+
+    .faq-item {
+      background: var(--bg-surface-glass);
+      backdrop-filter: var(--blur-acrylic);
+      -webkit-backdrop-filter: var(--blur-acrylic);
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      transition: all var(--duration-fast) ease;
+    }
+
+    .faq-item:hover {
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    .faq-question {
+      width: 100%;
+      background: none;
+      border: none;
+      padding: var(--space-5) var(--space-6);
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--color-text-primary);
+      text-align: left;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      gap: var(--space-4);
+    }
+
+    .faq-chevron {
+      flex-shrink: 0;
+      transition: transform var(--duration-normal) var(--ease-spring);
+      color: var(--color-text-muted);
+    }
+
+    .faq-item.open .faq-chevron {
+      transform: rotate(180deg);
+      color: var(--color-accent-cyan);
+    }
+
+    .faq-answer {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height var(--duration-normal) var(--ease-spring), padding var(--duration-normal) ease;
+      padding: 0 var(--space-6);
+      color: var(--color-text-secondary);
+      font-size: 0.94rem;
+      line-height: 1.65;
+    }
+
+    .faq-item.open .faq-answer {
+      max-height: 280px;
+      padding-bottom: var(--space-5);
+    }
+
+    /* ==========================================================================
+       Pre-Footer CTA Strip
+       ========================================================================== */
+    .cta-banner {
+      background: linear-gradient(135deg, rgba(1, 113, 227, 0.25), rgba(0, 240, 255, 0.12));
+      border: 1px solid var(--border-glass);
+      border-radius: var(--radius-xl);
+      padding: var(--space-12) var(--space-8);
+      text-align: center;
+      box-shadow: var(--shadow-card);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-banner h3 {
+      font-size: clamp(1.8rem, 3.2vw, 2.6rem);
+      font-weight: 800;
+      margin-bottom: var(--space-3);
+    }
+
+    .cta-banner p {
+      font-size: 1.05rem;
+      color: var(--color-text-secondary);
+      max-width: 600px;
+      margin: 0 auto var(--space-6);
+    }
+
+    .cta-actions {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-4);
+      flex-wrap: wrap;
+    }
+
+    /* ==========================================================================
+       Footer
+       ========================================================================== */
+    .site-footer {
+      border-top: 1px solid var(--border-subtle);
+      background: rgba(8, 11, 18, 0.95);
+      padding: var(--space-16) 0 var(--space-8);
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: var(--space-10);
+      margin-bottom: var(--space-12);
+    }
+
+    .footer-brand p {
+      color: var(--color-text-secondary);
+      font-size: 0.92rem;
+      margin-top: var(--space-3);
+      max-width: 320px;
+      line-height: 1.6;
+    }
+
+    .footer-col h5 {
+      font-size: 0.86rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--color-text-primary);
+      margin-bottom: var(--space-4);
+    }
+
+    .footer-col ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+    }
+
+    .footer-col a {
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color var(--duration-fast) ease;
+    }
+
+    .footer-col a:hover {
+      color: var(--color-accent-cyan);
+    }
+
+    .footer-bottom {
+      border-top: 1px solid var(--border-subtle);
+      padding-top: var(--space-6);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.82rem;
+      color: var(--color-text-muted);
+      flex-wrap: wrap;
+      gap: var(--space-4);
+    }
+
+    .footer-disclaimer {
+      font-size: 0.76rem;
+      color: var(--color-text-muted);
+      margin-top: var(--space-4);
+      line-height: 1.5;
+    }
+
+    /* ==========================================================================
+       Responsive Media Queries
+       ========================================================================== */
+    @media (max-width: 1024px) {
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-8);
+      }
+      .app-body {
+        grid-template-columns: 1fr;
+      }
+      .app-sidebar {
+        display: none;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+      .btn-hamburger {
+        display: block;
+      }
+      .nav-actions .btn-gh {
+        display: none;
+      }
+      .download-card-primary {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .dl-arrow-action {
+        display: none;
+      }
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Glow Canvas -->
+  <div class="ambient-canvas" aria-hidden="true">
+    <div class="ambient-blob blob-1"></div>
+    <div class="ambient-blob blob-2"></div>
+    <div class="ambient-blob blob-3"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <!-- Header / Navigation -->
+  <header class="site-header">
+    <div class="container nav-inner">
+      <a href="#" class="brand-logo" aria-label="HyperXLauncher Home">
+        <div class="brand-cube-icon">
+          <!-- Isometric Cube SVG Logo -->
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L3 7V17L12 22L21 17V7L12 2Z" stroke="#00F0FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M12 22V12" stroke="#00F0FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M21 7L12 12L3 7" stroke="#0171E3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="brand-title">
+          <span class="brand-gradient">HyperX</span>Launcher
+          <span class="version-tag">v1.0.1</span>
+        </div>
+      </a>
+
+      <nav aria-label="Primary Navigation">
+        <ul class="nav-links">
+          <li><a href="#features" class="nav-link">Features</a></li>
+          <li><a href="#ecosystem" class="nav-link">Ecosystem</a></li>
+          <li><a href="#specs" class="nav-link">System Specs</a></li>
+          <li><a href="#faq" class="nav-link">FAQ</a></li>
+          <li><a href="https://github.com/duongsecretvn/HyperXLauncher" target="_blank" rel="noopener noreferrer" class="nav-link">GitHub</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <a href="https://github.com/duongsecretvn/HyperXLauncher" target="_blank" rel="noopener noreferrer" class="btn-gh" aria-label="Star on GitHub">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          <span>Star</span>
+        </a>
+        <a href="#download" class="btn-nav-cta">Download v1.0.1</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ==========================================================================
+         Hero Stage
+         ========================================================================== -->
+    <section class="hero-section" id="download">
+      <div class="container">
+        <!-- Release Badge Pill -->
+        <div class="release-badge-wrapper">
+          <span class="pulse-dot"></span>
+          <span class="release-badge-text">HyperXLauncher v1.0.1 Official Release</span>
+        </div>
+
+        <!-- Hero Headline -->
+        <h1 class="hero-heading">
+          Next-Gen Minecraft Launcher.<br>
+          <span class="gradient-word">Built for Pure Speed & Freedom.</span>
+        </h1>
+
+        <p class="hero-subheading">
+          Experience effortless multi-instance isolation, automated Java provisioning, and instant access to Fabric, Forge, NeoForge, Quilt, CurseForge, and Modrinth. Zero bloat, zero telemetry drag.
+        </p>
+
+        <!-- Primary Download Card -->
+        <div class="download-hub">
+          <a id="primary-dl-card" href="HyperXLauncher-Setup-1.0.1.exe" download="HyperXLauncher-Setup-1.0.1.exe" class="download-card-primary" aria-label="Download HyperXLauncher for Windows">
+            <div class="dl-left">
+              <div class="dl-os-icon-box" id="dl-os-icon">
+                <!-- Windows SVG -->
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/>
+                </svg>
+              </div>
+              <div class="dl-title-block">
+                <h3 id="dl-title-text">
+                  Download for Windows (x64)
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                </h3>
+                <p id="dl-meta-text">HyperXLauncher-Setup-1.0.1.exe • 85.4 MB • Zero Dependencies</p>
+              </div>
+            </div>
+            <div class="dl-arrow-action" aria-hidden="true">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#FFFFFF" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+            </div>
+          </a>
+
+          <!-- OS Selector Pills -->
+          <div class="os-switcher" role="tablist" aria-label="Operating System Selection">
+            <button class="os-tab-btn active" role="tab" aria-selected="true" data-os="windows">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>
+              Windows (.exe)
+            </button>
+            <button class="os-tab-btn" role="tab" aria-selected="false" data-os="macos">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.42c.62-.75 1.04-1.8 0.93-2.85-.9.04-1.99.6-2.61 1.34-.55.63-1.03 1.68-.9 2.7.99.08 2.02-.52 2.58-1.19z"/></svg>
+              macOS (.dmg)
+            </button>
+            <button class="os-tab-btn" role="tab" aria-selected="false" data-os="linux">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12.003 0C8.36 0 6.6 2.54 6.6 4.96c0 1.83.67 3.32 1.45 4.78.29.54.58 1.12.82 1.76-1.28.32-2.64.91-3.66 1.81-1.39 1.23-2.21 2.87-2.21 4.75 0 2.97 2.17 4.94 5.25 5.59.83.18 1.76.27 2.75.31.33.02.66.04 1 .04.34 0 .67-.02 1-.04.99-.04 1.92-.13 2.75-.31 3.08-.65 5.25-2.62 5.25-5.59 0-1.88-.82-3.52-2.21-4.75-1.02-.9-2.38-1.49-3.66-1.81.24-.64.53-1.22.82-1.76.78-1.46 1.45-2.95 1.45-4.78C17.406 2.54 15.646 0 12.003 0z"/></svg>
+              Linux (.AppImage)
+            </button>
+          </div>
+        </div>
+
+        <!-- Acrylic Launcher Window Preview -->
+        <div class="preview-stage">
+          <div class="preview-glow-backdrop"></div>
+          <div class="window-frame">
+            <!-- Window Titlebar -->
+            <div class="window-titlebar">
+              <div class="window-controls">
+                <span class="window-dot dot-close"></span>
+                <span class="window-dot dot-min"></span>
+                <span class="window-dot dot-max"></span>
+              </div>
+              <div class="window-title-text">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#00F0FF" stroke-width="2"><path d="M12 2L3 7V17L12 22L21 17V7L12 2Z"/></svg>
+                HyperXLauncher — Live Workspace
+              </div>
+              <div class="window-status-pill">
+                ● Adoptium OpenJDK 21
+              </div>
+            </div>
+
+            <!-- Window App Body -->
+            <div class="app-body">
+              <!-- Sidebar -->
+              <aside class="app-sidebar">
+                <div class="sidebar-item active">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+                  Instances
+                </div>
+                <div class="sidebar-item">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                  Modpack Hub
+                </div>
+                <div class="sidebar-item">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
+                  CurseForge / Modrinth
+                </div>
+                <div class="sidebar-item">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                  Engine Settings
+                </div>
+
+                <div class="sidebar-telemetry">
+                  <div class="telemetry-row">
+                    <span>Allocated RAM</span>
+                    <span class="telemetry-val">8192 MB</span>
+                  </div>
+                  <div class="telemetry-row">
+                    <span>Active Java</span>
+                    <span class="telemetry-val">v21.0.2</span>
+                  </div>
+                  <div class="telemetry-row">
+                    <span>GPU Direct</span>
+                    <span class="telemetry-val" style="color: var(--color-accent-emerald);">RTX 4080 (Primary)</span>
+                  </div>
+                </div>
+              </aside>
+
+              <!-- Main Canvas -->
+              <div class="app-main">
+                <div class="instance-header-bar">
+                  <div class="instance-headline">
+                    <h4>Installed Instances (3)</h4>
+                    <span>Discrete directories, isolated mods, instant launch</span>
+                  </div>
+                  <button class="btn-create-inst">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    New Instance
+                  </button>
+                </div>
+
+                <div class="preview-instances-grid">
+                  <!-- Instance Card 1 -->
+                  <div class="inst-card">
+                    <div class="inst-badge-row">
+                      <div class="inst-icon-logo badge-fabric">FB</div>
+                      <div class="inst-play-btn" title="Launch Instance">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                      </div>
+                    </div>
+                    <div class="inst-info">
+                      <h5>Prominence II [RPG]</h5>
+                      <p>Minecraft 1.20.1 • Fabric 0.15.7</p>
+                    </div>
+                    <div class="inst-meta-tag">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                      342 Active Mods • Iris Shaders
+                    </div>
+                  </div>
+
+                  <!-- Instance Card 2 -->
+                  <div class="inst-card">
+                    <div class="inst-badge-row">
+                      <div class="inst-icon-logo badge-neoforge">NF</div>
+                      <div class="inst-play-btn" title="Launch Instance">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                      </div>
+                    </div>
+                    <div class="inst-info">
+                      <h5>All The Mods 9 (ATM9)</h5>
+                      <p>Minecraft 1.20.4 • NeoForge 20.4.80</p>
+                    </div>
+                    <div class="inst-meta-tag">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                      418 Active Mods • NeoForge Core
+                    </div>
+                  </div>
+
+                  <!-- Instance Card 3 -->
+                  <div class="inst-card">
+                    <div class="inst-badge-row">
+                      <div class="inst-icon-logo badge-forge">FG</div>
+                      <div class="inst-play-btn" title="Launch Instance">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                      </div>
+                    </div>
+                    <div class="inst-info">
+                      <h5>RLCraft Dregora</h5>
+                      <p>Minecraft 1.12.2 • Forge 14.23.5</p>
+                    </div>
+                    <div class="inst-meta-tag">
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+                      189 Active Mods • OptiFine HD
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Features Section (Interactive Tab Switcher)
+         ========================================================================== -->
+    <section class="section-block" id="features">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-eyebrow">Engineered For Enthusiasts</span>
+          <h2 class="section-title">Peak Performance Features</h2>
+          <p class="section-desc">
+            Everything you need for seamless modded Minecraft gameplay. Crafted with modern TypeScript, Electron, and the Astryx design language.
+          </p>
+        </div>
+
+        <!-- Feature Tabs Selector -->
+        <div class="feature-tabs-nav" role="tablist" aria-label="Feature Matrix Tabs">
+          <button class="feature-tab-trigger active" role="tab" id="tab-btn-orchestrator" aria-controls="tab-orchestrator" aria-selected="true" data-tab="tab-orchestrator">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+            Instance Orchestrator
+          </button>
+          <button class="feature-tab-trigger" role="tab" id="tab-btn-turbo" aria-controls="tab-turbo" aria-selected="false" data-tab="tab-turbo">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+            Turbo Downloader
+          </button>
+          <button class="feature-tab-trigger" role="tab" id="tab-btn-modpack" aria-controls="tab-modpack" aria-selected="false" data-tab="tab-modpack">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path></svg>
+            Modpack Hub
+          </button>
+          <button class="feature-tab-trigger" role="tab" id="tab-btn-telemetry" aria-controls="tab-telemetry" aria-selected="false" data-tab="tab-telemetry">
+            <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+            Engine & Telemetry
+          </button>
+        </div>
+
+        <!-- Panels Container -->
+        <div class="features-panel-container">
+          <!-- Panel 1: Instance Orchestrator -->
+          <div class="feature-panel active" id="tab-orchestrator" role="tabpanel" aria-labelledby="tab-btn-orchestrator">
+            <div class="feature-glass-card">
+              <div class="card-icon-halo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path></svg>
+              </div>
+              <h4>Discrete Data Sandboxing</h4>
+              <p>Each profile is isolated into its own sandboxed directory. Never worry about conflicting keybinds, corrupted world saves, or config collisions between versions.</p>
+              <span class="card-feature-pill">ISOLATION: 100% HARDENED</span>
+            </div>
+
+            <div class="feature-glass-card">
+              <div class="card-icon-halo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+              </div>
+              <h4>Version Freezing & Clones</h4>
+              <p>Duplicate any modpack with a single click before updating. Revert instantly if a new mod version breaks your server or multiplayer compatibility.</p>
+              <span class="card-feature-pill">ONE-CLICK SNAPSHOTS</span>
+            </div>
+
+            <div class="feature-glass-card">
+              <div class="card-icon-halo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+              </div>
+              <h4>Multi-Version Minecraft</h4>
+              <p>Run classic Alpha 1.2.6, historic 1.7.10, gold standard 1.12.2, or latest 1.20.4+ side-by-side with appropriate Java runtimes mapped automatically.</p>
+              <span class="card-feature-pill">ALPHA TO 1.21 READY</span>
+            </div>
+          </div>
+
+          <!-- Panel 2: Turbo Downloader -->
+          <div class="feature-panel" id="tab-turbo" role="tabpanel" aria-labelledby="tab-btn-turbo">
+            <div class="feature-glass-card">
+              <div class="card-icon-halo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>
+              </div>
+              <h4>Parallel Multithreaded Engine</h4>
+              <p>Download libraries, assets, and 400+ mods concurrently with up to 64 connection pipes. Max out your Gigabit internet without throttling or stalling.</p>
+              <span class="card-feature-pill">SPEED: 64 CONCURRENT THREADS</span>
+            </div>
+
+            <div class="feature-glass-card">
+              <div class="card-icon-halo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+              </div>
+              <h4>SHA-1 & SHA-512 Verification</h4>
+              <p>Every single downloaded JAR, asset sound, and texture index is verified against upstream cryptographic checksums. Zero corrupted assets, guaranteed.</p>
+              <span class="card-feature-pill">ZERO CORRUPTION HASH</span>
+            </div>
+
+            <div class="feature-glass-card">
+              <div class="card-icon-halo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+              </div>
+              <h4>Smart Global Asset Deduplication</h4>
+              <p>All Minecraft versions and modpacks share an intelligent content-addressable storage pool. Save up to 80% disk space across dozens of modpacks.</p>
+              <span class="card-feature-pill">SAVES 80% DISK SPACE</span>
+            </div>
+          </div>
+
+          <!-- Panel 3: Modpack Hub -->
+          <div class="feature-panel" id="tab-modpack" role="tabpanel" aria-labelledby="tab-btn-modpack">
+            <div class="feature-glass-card">
+              <div class="card-icon-halo">
+                <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+              </div>
+              <h4>CurseForge & Modrinth Browsing</h4>
+              <p>Explore hundreds of thousands of mods, resource packs, shaders, and world maps right inside the client with instant one-click install.</p>
+              <span class="card-feature-pill">UNIFIED ECOSYSTEM API</span>
+            </div>
+
+            <div class="feature-glass-card">
+              <div class="card-icon-halo">
+                <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+              </div>
+              <h4>One-Click Batch Upgrades</h4>
+              <p>Detect outdated mods and upgrade them in bulk with automatic dependency resolution. Incompatible dependencies are flagged before launching.</p>
+              <span class="card-feature-pill">SAFE DEPENDENCY RESOLVER</span>
+            </div>
+
+            <div class="feature-glass-card">
+              <div class="card-icon-halo">
+                <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+              </div>
+              <h4>Prism & MultiMC Import</h4>
+              <p>Migrating from another launcher? Drag and drop your zip exports or let HyperXLauncher auto-detect installed instances from Prism, CurseForge, or FTB.</p>
+              <span class="card-feature-pill">ZERO PAIN MIGRATION</span>
+            </div>
+          </div>
+
+          <!-- Panel 4: Engine & Telemetry -->
+          <div class="feature-panel" id="tab-telemetry" role="tabpanel" aria-labelledby="tab-btn-telemetry">
+            <div class="feature-glass-card">
+              <div class="card-icon-halo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect><line x1="9" y1="1" x2="9" y2="4"></line><line x1="15" y1="1" x2="15" y2="4"></line><line x1="9" y1="20" x2="9" y2="23"></line><line x1="15" y1="20" x2="15" y2="23"></line><line x1="20" y1="9" x2="23" y2="9"></line><line x1="20" y1="14" x2="23" y2="14"></line><line x1="1" y1="9" x2="4" y2="9"></line><line x1="1" y1="14" x2="4" y2="14"></line></svg>
+              </div>
+              <h4>Auto-Provisioned Adoptium Java</h4>
+              <p>No manual JDK installations. HyperXLauncher downloads and isolates Temurin Java 8, 17, and 21 tailored specifically to your OS architecture.</p>
+              <span class="card-feature-pill">TEMURIN OPENJDK 8/17/21</span>
+            </div>
+
+            <div class="feature-glass-card">
+              <div class="card-icon-halo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+              </div>
+              <h4>GPU Force Routing & GC Presets</h4>
+              <p>Force Minecraft to utilize high-performance discrete GPUs on laptops. Built-in Shenandoah and ZGC garbage collector presets eliminate stutter spikes.</p>
+              <span class="card-feature-pill">LOW LATENCY GC PRESETS</span>
+            </div>
+
+            <div class="feature-glass-card">
+              <div class="card-icon-halo">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+              </div>
+              <h4>Real-Time Crash Log Inspector</h4>
+              <p>When a game crashes, HyperXLauncher highlights the exact mod causing the stack trace. Easily export clean logs or pastebin with stripped tokens.</p>
+              <span class="card-feature-pill">SMART CRASH DIAGNOSTICS</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Modloader & Marketplace Ecosystem Grid
+         ========================================================================== -->
+    <section class="section-block" id="ecosystem">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-eyebrow">Comprehensive Integration</span>
+          <h2 class="section-title">The Complete Mod Ecosystem</h2>
+          <p class="section-desc">
+            Universal compatibility with every primary modloader and distribution hub in the Minecraft community.
+          </p>
+        </div>
+
+        <div class="ecosystem-grid">
+          <!-- Fabric -->
+          <div class="eco-card eco-fabric">
+            <div class="eco-card-top">
+              <div class="eco-icon-wrapper" style="color: #00F0FF;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+              </div>
+              <h4>Fabric</h4>
+            </div>
+            <p>Lightweight, experimental, and lightning fast. Seamless support for Fabric Loader and Iris Shaders.</p>
+            <span class="eco-tag">Snapshot & Release Ready</span>
+          </div>
+
+          <!-- NeoForge -->
+          <div class="eco-card eco-neoforge">
+            <div class="eco-card-top">
+              <div class="eco-icon-wrapper" style="color: #F97316;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+              </div>
+              <h4>NeoForge</h4>
+            </div>
+            <p>The modern powerhouse modloader designed for Minecraft 1.20.4+ massive modpacks and stability.</p>
+            <span class="eco-tag">1.20.4+ Next-Gen Standard</span>
+          </div>
+
+          <!-- Minecraft Forge -->
+          <div class="eco-card eco-forge">
+            <div class="eco-card-top">
+              <div class="eco-icon-wrapper" style="color: #EF4444;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
+              </div>
+              <h4>Minecraft Forge</h4>
+            </div>
+            <p>The historic bedrock of modded Minecraft. Full legacy support spanning 1.7.10 through modern releases.</p>
+            <span class="eco-tag">Historic & Proven</span>
+          </div>
+
+          <!-- Quilt -->
+          <div class="eco-card eco-quilt">
+            <div class="eco-card-top">
+              <div class="eco-icon-wrapper" style="color: #A855F7;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><path d="M8 14s1.5 2 4 2 4-2 4-2"></path><line x1="9" y1="9" x2="9.01" y2="9"></line><line x1="15" y1="9" x2="15.01" y2="9"></line></svg>
+              </div>
+              <h4>Quilt</h4>
+            </div>
+            <p>Modular, forward-looking loader ecosystem engineered with native Fabric mod backwards compatibility.</p>
+            <span class="eco-tag">Modular & Interoperable</span>
+          </div>
+
+          <!-- CurseForge -->
+          <div class="eco-card eco-curseforge">
+            <div class="eco-card-top">
+              <div class="eco-icon-wrapper" style="color: #F87171;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              </div>
+              <h4>CurseForge</h4>
+            </div>
+            <p>Direct in-app access to the largest library of 100,000+ modpacks, shaders, and resource textures.</p>
+            <span class="eco-tag">Full API Search & Download</span>
+          </div>
+
+          <!-- Modrinth -->
+          <div class="eco-card eco-modrinth">
+            <div class="eco-card-top">
+              <div class="eco-icon-wrapper" style="color: #10B981;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+              </div>
+              <h4>Modrinth</h4>
+            </div>
+            <p>Ultra-fast open source platform with native CDN hosting, rapid mod updates, and zero ads.</p>
+            <span class="eco-tag">Blazing Open Source CDN</span>
+          </div>
+
+          <!-- FTB -->
+          <div class="eco-card eco-ftb">
+            <div class="eco-card-top">
+              <div class="eco-icon-wrapper" style="color: #EAB308;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline></svg>
+              </div>
+              <h4>Feed The Beast (FTB)</h4>
+            </div>
+            <p>Direct compatibility with celebrated FTB questing packs and progression-driven modded experiences.</p>
+            <span class="eco-tag">Legendary Questing Packs</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         System Specs Section
+         ========================================================================== -->
+    <section class="section-block" id="specs">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-eyebrow">Hardware Requirements</span>
+          <h2 class="section-title">System Specifications</h2>
+          <p class="section-desc">
+            Optimized to run smoothly on thin-and-light laptops and high-end watercooled rigs alike.
+          </p>
+        </div>
+
+        <div class="specs-table-wrapper">
+          <table class="specs-table">
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Minimum (Vanilla / Light Mods)</th>
+                <th>Recommended (Standard Packs)</th>
+                <th>Enthusiast (300+ Mods & Shaders)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="spec-cat">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                  Operating System
+                </td>
+                <td>Windows 10 x64, macOS 11+, Linux x64</td>
+                <td class="spec-highlight">Windows 11 x64, macOS 13+ (Apple Silicon), Linux</td>
+                <td class="spec-highlight">Windows 11 64-bit, Arch / Fedora / Ubuntu</td>
+              </tr>
+              <tr>
+                <td class="spec-cat">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2" ry="2"></rect><rect x="9" y="9" width="6" height="6"></rect></svg>
+                  Processor (CPU)
+                </td>
+                <td>Intel Core i3-4130 / AMD FX-6300</td>
+                <td>Intel Core i5-10400 / AMD Ryzen 5 3600</td>
+                <td class="spec-highlight">Intel Core i7-13700K / Ryzen 7 7800X3D</td>
+              </tr>
+              <tr>
+                <td class="spec-cat">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20"></path><path d="M20 12v8H4v-8"></path><path d="M6 4h12l2 8H4l2-8z"></path></svg>
+                  System Memory (RAM)
+                </td>
+                <td>4 GB (2.5 GB allocated to Java)</td>
+                <td>8 GB - 16 GB (6 GB allocated)</td>
+                <td class="spec-highlight">32 GB (8 - 12 GB allocated with ZGC)</td>
+              </tr>
+              <tr>
+                <td class="spec-cat">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                  Graphics (GPU)
+                </td>
+                <td>Intel HD 4000 / Radeon Vega 8</td>
+                <td>NVIDIA GTX 1660 / AMD RX 580</td>
+                <td class="spec-highlight">NVIDIA RTX 3070 / 4080 / AMD RX 7800 XT</td>
+              </tr>
+              <tr>
+                <td class="spec-cat">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+                  Java Runtime
+                </td>
+                <td colspan="3" style="text-align: center; color: var(--color-accent-cyan); font-weight: 600;">
+                  ★ Fully Auto-Provisioned: Adoptium OpenJDK 8, 17, and 21 (Zero manual Java installation required)
+                </td>
+              </tr>
+              <tr>
+                <td class="spec-cat">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+                  Disk Storage
+                </td>
+                <td>500 MB launcher footprint</td>
+                <td>SSD Recommended (10 GB for mod caches)</td>
+                <td class="spec-highlight">NVMe SSD (Ultra-fast chunk streaming)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         FAQ Accordion Section
+         ========================================================================== -->
+    <section class="section-block" id="faq">
+      <div class="container">
+        <div class="section-header">
+          <span class="section-eyebrow">Clear Answers</span>
+          <h2 class="section-title">Frequently Asked Questions</h2>
+          <p class="section-desc">
+            Everything you need to know about safety, installation, licensing, and mod management.
+          </p>
+        </div>
+
+        <div class="faq-container">
+          <!-- FAQ 1 (Open by default) -->
+          <div class="faq-item open">
+            <button class="faq-question" id="faq-q-1" aria-controls="faq-a-1" aria-expanded="true">
+              <span>Is HyperXLauncher safe, open source, and free?</span>
+              <svg class="faq-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="faq-answer" id="faq-a-1" role="region" aria-labelledby="faq-q-1">
+              Yes, 100%. HyperXLauncher is fully open source under the MIT license with complete public repository visibility on GitHub (<a href="https://github.com/duongsecretvn/HyperXLauncher" target="_blank" rel="noopener noreferrer" style="color: var(--color-accent-cyan);">github.com/duongsecretvn/HyperXLauncher</a>). It contains zero ads, zero crypto miners, and zero closed-source telemetry tracking. All authentication goes directly through official Microsoft OAuth2 encrypted endpoints.
+            </div>
+          </div>
+
+          <!-- FAQ 2 -->
+          <div class="faq-item">
+            <button class="faq-question" id="faq-q-2" aria-controls="faq-a-2" aria-expanded="false">
+              <span>How do I install version 1.0.1 on Windows?</span>
+              <svg class="faq-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="faq-answer" id="faq-a-2" role="region" aria-labelledby="faq-q-2">
+              Simply download <code>HyperXLauncher-Setup-1.0.1.exe</code> from the download button above. Run the executable to install the launcher cleanly onto your system. It automatically sets up the desktop shortcut and registers the file protocols.
+            </div>
+          </div>
+
+          <!-- FAQ 3 -->
+          <div class="faq-item">
+            <button class="faq-question" id="faq-q-3" aria-controls="faq-a-3" aria-expanded="false">
+              <span>Do I need to install Java manually before playing?</span>
+              <svg class="faq-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="faq-answer" id="faq-a-3" role="region" aria-labelledby="faq-q-3">
+              No. HyperXLauncher features automated Java provisioning powered by Adoptium Temurin. When you launch a Minecraft version (whether historic 1.7.10 requiring Java 8 or modern 1.20.4 requiring Java 17/21), the launcher detects the exact JDK required and provisions it securely in an isolated runtime folder.
+            </div>
+          </div>
+
+          <!-- FAQ 4 -->
+          <div class="faq-item">
+            <button class="faq-question" id="faq-q-4" aria-controls="faq-a-4" aria-expanded="false">
+              <span>Can I import my existing instances from Prism, CurseForge, or MultiMC?</span>
+              <svg class="faq-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="faq-answer" id="faq-a-4" role="region" aria-labelledby="faq-q-4">
+              Yes. Navigate to "Instances -> Import" and choose your exported zip file or select your local Prism/CurseForge instances folder. HyperXLauncher will parse your mod manifests, configs, and save worlds seamlessly without re-downloading existing files.
+            </div>
+          </div>
+
+          <!-- FAQ 5 -->
+          <div class="faq-item">
+            <button class="faq-question" id="faq-q-5" aria-controls="faq-a-5" aria-expanded="false">
+              <span>How are my Microsoft credentials and token storage protected?</span>
+              <svg class="faq-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="faq-answer" id="faq-a-5" role="region" aria-labelledby="faq-q-5">
+              Authentication uses official Microsoft OAuth2 authorization code flow with PKCE (Proof Key for Code Exchange). Your credentials are never seen or stored by HyperXLauncher. Acquired tokens are stored securely using your operating system's native encrypted keychain (Windows DPAPI, macOS Keychain, or Linux Secret Service).
+            </div>
+          </div>
+
+          <!-- FAQ 6 -->
+          <div class="faq-item">
+            <button class="faq-question" id="faq-q-6" aria-controls="faq-a-6" aria-expanded="false">
+              <span>How does HyperXLauncher achieve faster download speeds?</span>
+              <svg class="faq-chevron" aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+            </button>
+            <div class="faq-answer" id="faq-a-6" role="region" aria-labelledby="faq-q-6">
+              Traditional launchers download assets sequentially with a small connection pool. HyperXLauncher utilizes an asynchronous chunked multiplexer with automatic mirror balancing across Mojang, Cloudflare, and CDN edge endpoints, downloading up to 64 streams simultaneously.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================================================
+         Pre-Footer Call to Action Banner
+         ========================================================================== -->
+    <section class="section-block" style="padding-top: var(--space-8); padding-bottom: var(--space-16);">
+      <div class="container">
+        <div class="cta-banner">
+          <h3>Ready for Pure Minecraft Performance?</h3>
+          <p>
+            Join thousands of modded Minecraft players enjoying instant launches, zero memory leaks, and seamless mod management.
+          </p>
+          <div class="cta-actions">
+            <a href="HyperXLauncher-Setup-1.0.1.exe" download="HyperXLauncher-Setup-1.0.1.exe" class="btn-nav-cta" style="padding: 12px 28px; font-size: 1rem;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              Download HyperXLauncher v1.0.1
+            </a>
+            <a href="https://github.com/duongsecretvn/HyperXLauncher" target="_blank" rel="noopener noreferrer" class="btn-gh" style="padding: 12px 22px; font-size: 1rem;">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+              View on GitHub
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================================================
+       Site Footer
+       ========================================================================== -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <a href="#" class="brand-logo" aria-label="HyperXLauncher Home">
+            <div class="brand-cube-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2L3 7V17L12 22L21 17V7L12 2Z" stroke="#00F0FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M12 22V12" stroke="#00F0FF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M21 7L12 12L3 7" stroke="#0171E3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="brand-title">
+              <span class="brand-gradient">HyperX</span>Launcher
+              <span class="version-tag">v1.0.1</span>
+            </div>
+          </a>
+          <p>
+            An ultra-fast, modern, acrylic-styled Minecraft launcher designed for instant launch, multi-instance isolation, and boundless modding freedom.
+          </p>
+        </div>
+
+        <div class="footer-col">
+          <h5>Product</h5>
+          <ul>
+            <li><a href="#download">Download v1.0.1</a></li>
+            <li><a href="#features">Feature Matrix</a></li>
+            <li><a href="#ecosystem">Mod Ecosystem</a></li>
+            <li><a href="#specs">System Specs</a></li>
+            <li><a href="HyperXLauncher-Setup-1.0.1.exe">Windows Installer (.exe)</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Resources</h5>
+          <ul>
+            <li><a href="https://github.com/duongsecretvn/HyperXLauncher" target="_blank" rel="noopener noreferrer">GitHub Repository</a></li>
+            <li><a href="https://github.com/duongsecretvn/HyperXLauncher/releases" target="_blank" rel="noopener noreferrer">Release Notes</a></li>
+            <li><a href="https://github.com/duongsecretvn/HyperXLauncher/issues" target="_blank" rel="noopener noreferrer">Issue Tracker</a></li>
+            <li><a href="#faq">FAQ & Troubleshooting</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h5>Community</h5>
+          <ul>
+            <li><a href="https://github.com/duongsecretvn/HyperXLauncher" target="_blank" rel="noopener noreferrer">Contribute Code</a></li>
+            <li><a href="https://github.com/duongsecretvn/HyperXLauncher/blob/master/CONTRIBUTING.md" target="_blank" rel="noopener noreferrer">Contributing Guide</a></li>
+            <li><a href="https://github.com/duongsecretvn/HyperXLauncher/blob/master/LICENSE" target="_blank" rel="noopener noreferrer">MIT License</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; 2026 HyperXLauncher Contributors. Open source under the MIT License.
+        </div>
+        <div>
+          Official Repository: <a href="https://github.com/duongsecretvn/HyperXLauncher" target="_blank" rel="noopener noreferrer" style="color: var(--color-accent-cyan);">duongsecretvn/HyperXLauncher</a>
+        </div>
+      </div>
+
+      <p class="footer-disclaimer">
+        Disclaimer: HyperXLauncher is an independent open-source project and is not affiliated with, endorsed by, or associated with Mojang Studios, Microsoft Corporation, or any of their affiliates. "Minecraft" is a registered trademark of Mojang Synergies AB.
+      </p>
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       Interactive Behaviors (Tab Switching, OS Selection, FAQ Accordion)
+       Zero External Dependencies — Vanilla ES6+
+       ========================================================================== -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. OS Download Pill Tab Switcher
+      const osData = {
+        windows: {
+          title: 'Download for Windows (x64)',
+          meta: 'HyperXLauncher-Setup-1.0.1.exe • 85.4 MB • Zero Dependencies',
+          file: 'HyperXLauncher-Setup-1.0.1.exe',
+          icon: `<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.9-1.801"/></svg>`
+        },
+        macos: {
+          title: 'Download for macOS (Universal)',
+          meta: 'HyperXLauncher-1.0.1.dmg • 89.2 MB • Apple Silicon & Intel',
+          file: 'HyperXLauncher-Setup-1.0.1.exe', // Fallback or direct link
+          icon: `<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.42c.62-.75 1.04-1.8 0.93-2.85-.9.04-1.99.6-2.61 1.34-.55.63-1.03 1.68-.9 2.7.99.08 2.02-.52 2.58-1.19z"/></svg>`
+        },
+        linux: {
+          title: 'Download for Linux (AppImage)',
+          meta: 'HyperXLauncher-1.0.1.AppImage • 84.1 MB • All Distributions',
+          file: 'HyperXLauncher-Setup-1.0.1.exe', // Fallback or direct link
+          icon: `<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M12.003 0C8.36 0 6.6 2.54 6.6 4.96c0 1.83.67 3.32 1.45 4.78.29.54.58 1.12.82 1.76-1.28.32-2.64.91-3.66 1.81-1.39 1.23-2.21 2.87-2.21 4.75 0 2.97 2.17 4.94 5.25 5.59.83.18 1.76.27 2.75.31.33.02.66.04 1 .04.34 0 .67-.02 1-.04.99-.04 1.92-.13 2.75-.31 3.08-.65 5.25-2.62 5.25-5.59 0-1.88-.82-3.52-2.21-4.75-1.02-.9-2.38-1.49-3.66-1.81.24-.64.53-1.22.82-1.76.78-1.46 1.45-2.95 1.45-4.78C17.406 2.54 15.646 0 12.003 0z"/></svg>`
+        }
+      };
+
+      const osTabs = document.querySelectorAll('.os-tab-btn');
+      const primaryDlCard = document.getElementById('primary-dl-card');
+      const dlTitleText = document.getElementById('dl-title-text');
+      const dlMetaText = document.getElementById('dl-meta-text');
+      const dlOsIcon = document.getElementById('dl-os-icon');
+
+      osTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          osTabs.forEach(t => {
+            t.classList.remove('active');
+            t.setAttribute('aria-selected', 'false');
+          });
+          tab.classList.add('active');
+          tab.setAttribute('aria-selected', 'true');
+
+          const osKey = tab.getAttribute('data-os');
+          const data = osData[osKey];
+          if (data) {
+            dlTitleText.innerHTML = `${data.title} <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+            dlMetaText.textContent = data.meta;
+            primaryDlCard.setAttribute('href', data.file);
+            primaryDlCard.setAttribute('download', data.file);
+            primaryDlCard.setAttribute('aria-label', `Download HyperXLauncher for ${tab.textContent.trim()}`);
+            dlOsIcon.innerHTML = data.icon;
+          }
+        });
+      });
+
+      // 2. Feature Matrix Tabs
+      const featureTriggers = document.querySelectorAll('.feature-tab-trigger');
+      const featurePanels = document.querySelectorAll('.feature-panel');
+
+      featureTriggers.forEach(btn => {
+        btn.addEventListener('click', () => {
+          featureTriggers.forEach(b => {
+            b.classList.remove('active');
+            b.setAttribute('aria-selected', 'false');
+          });
+          featurePanels.forEach(p => p.classList.remove('active'));
+
+          btn.classList.add('active');
+          btn.setAttribute('aria-selected', 'true');
+
+          const targetId = btn.getAttribute('data-tab');
+          const activePanel = document.getElementById(targetId);
+          if (activePanel) {
+            activePanel.classList.add('active');
+          }
+        });
+      });
+
+      // 3. FAQ Accordion Collapsible
+      const faqQuestions = document.querySelectorAll('.faq-question');
+
+      faqQuestions.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const item = btn.parentElement;
+          const isOpen = item.classList.contains('open');
+
+          // Close all open items
+          document.querySelectorAll('.faq-item').forEach(i => {
+            i.classList.remove('open');
+            const q = i.querySelector('.faq-question');
+            if (q) q.setAttribute('aria-expanded', 'false');
+          });
+
+          // Toggle current item
+          if (!isOpen) {
+            item.classList.add('open');
+            btn.setAttribute('aria-expanded', 'true');
+          }
+        });
+      });
+
+      // 4. Smooth Anchor Scroll Adjustment for Fixed Header
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+          const targetId = this.getAttribute('href');
+          if (targetId === '#') return;
+          const targetEl = document.querySelector(targetId);
+          if (targetEl) {
+            e.preventDefault();
+            const headerOffset = 80;
+            const elementPosition = targetEl.getBoundingClientRect().top;
+            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+
+            window.scrollTo({
+              top: offsetPosition,
+              behavior: 'smooth'
+            });
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
